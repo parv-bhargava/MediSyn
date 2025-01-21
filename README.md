@@ -1,4 +1,4 @@
-# SmartHive: Multi-Agent System for IPE
+# MediSyn: A Synergistic multi-agent AI system for IPE in medical domain.
 
 ## Capstone Proposal
 
