@@ -12,7 +12,7 @@
 ---
 
 ### Objective:
-The goal of **SmartHive** is to design, develop, and validate a multi-agent chatbot system capable of simulating educational conversations representing diverse team members in typical medical and public health settings. The SmartHive project seeks to enhance **Interprofessional Education (IPE)** experiences, which foster collaboration and mutual learning among students from multiple professional domains. Key objectives include:
+The goal of **MediSyn** is to design, develop, and validate a multi-agent chatbot system capable of simulating educational conversations representing diverse team members in typical medical and public health settings. The MediSyn project seeks to enhance **Interprofessional Education (IPE)** experiences, which foster collaboration and mutual learning among students from multiple professional domains. Key objectives include:
 
 1. Customizing an open-source LLM (e.g., LLaMA3) using Retrieval-Augmented Generation (RAG) and/or fine-tuning techniques (e.g., LoRA) to create chatbot agents tailored for IPE.
 2. Evaluating the performance of the chatbot system (e.g., adherence to professional guidelines, quality of interaction, and depth of knowledge representation).
@@ -46,7 +46,7 @@ The project is structured into several key phases:
 ---
 
 ### Timeline:
-The estimated timeline for SmartHive development:
+The estimated timeline for MediSyn development:
 
 - **Weeks 1-2**: Initial requirement analysis and tool selection.
 - **Weeks 3-8**: Prototype design and development.
