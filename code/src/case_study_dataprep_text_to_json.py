@@ -6,10 +6,26 @@ from pathlib import Path
 
 
 def clean_text(t):
+    """Normalize whitespace and clean text content.
+
+        Args:
+            t (str): Input text with potential irregular whitespace
+
+        Returns:
+            str: Text with single spaces between words and no leading/trailing spaces
+    """
     return ' '.join(t.split()).strip()
 
 
 def extract_patient_info(text):
+    """Extract patient information from case study text.
+
+        Args:
+            text (str): Full text of the case study
+
+        Returns:
+            dict: Dictionary containing name, age, and diagnosis list
+    """
     patient_info = {"name": "", "age": "", "diagnosis": []}
     patient_match = re.search(r'Meet The Team\n\n(.+?)\n\n', text, re.DOTALL)
     if patient_match:
@@ -25,11 +41,27 @@ def extract_patient_info(text):
 
 
 def extract_summary(text):
+    """Extract and clean the summary section from case study text.
+
+        Args:
+            text (str): Full text of the case study
+
+        Returns:
+            str: Cleaned summary text or empty string if not found
+    """
     summary_match = re.search(r'Summary\n\n(.+?)\nPatient Info', text, re.DOTALL)
     return clean_text(summary_match.group(1)) if summary_match else ""
 
 
 def extract_team_members(text):
+    """Extract list of team members from case study text.
+
+        Args:
+            text (str): Full text of the case study
+
+        Returns:
+            list: List of unique team member names, excluding patient info
+    """
     team_members = []
     team_section_match = re.search(r'Meet The Team\n\n(.+?)\nFamily', text, re.DOTALL)
     if team_section_match:
@@ -40,11 +72,28 @@ def extract_team_members(text):
 
 
 def extract_background(text):
+    """Extract and clean the background section from case study text.
+
+        Args:
+            text (str): Full text of the case study
+
+        Returns:
+            str: Cleaned background text or empty string if not found
+    """
     background_match = re.search(r'Background\n\n(.+?)\nHow They Collaborated', text, re.DOTALL)
     return clean_text(background_match.group(1)) if background_match else ""
 
 
 def parse_assessment_results(text):
+    """Parse assessment results section from case study text.
+
+        Args:
+            text (str): Full text of the case study
+
+        Returns:
+            dict: Dictionary with general results and role-specific findings
+                  Structure: {"general_results": str, "roles": {role: description}}
+    """
     section = {"general_results": "", "roles": {}}
 
     # Find content between Assessment Results and IPP Treatment Plan
@@ -80,6 +129,15 @@ def parse_assessment_results(text):
     return section
 
 def parse_assessment_plan(text):
+    """Parse assessment plan section from case study text.
+
+        Args:
+            text (str): Full text of the case study
+
+        Returns:
+            dict: Dictionary with general plan and role-specific responsibilities
+                  Structure: {"general_plan": str, "roles": {role: description}}
+    """
     section = {"general_plan": "", "roles": {}}
 
     # Find content between Assessment Plan and Assessment Results
@@ -119,6 +177,15 @@ def parse_assessment_plan(text):
     return section
 
 def parse_treatment_plan(text):
+    """Parse treatment plan section from case study text.
+
+        Args:
+            text (str): Full text of the case study
+
+        Returns:
+            dict: Dictionary with general plan and role-specific actions
+                  Structure: {"general_plan": str, "roles": {role: description}}
+    """
     section = {"general_plan": "", "roles": {}}
 
     # Find content between IPP Treatment Plan and Treatment Outcomes
@@ -157,44 +224,22 @@ def parse_treatment_plan(text):
 
     return section
 
-def parse_section(text, start_pattern, end_pattern, general_key):
-    section = {general_key: "", "roles": {}}
-    # Use more flexible section boundary detection
-    section_match = re.search(
-        fr'{start_pattern}\n\n(.*?)(?=\n{end_pattern}|\Z)',
-        text,
-        re.DOTALL
-    )
-    if not section_match:
-        return section
-
-    content = section_match.group(1)
-    # Enhanced cleaning of page navigation elements
-    cleaned_content = re.sub(
-        r'Go back to Summary|Continue for more|Summary Page \d+ of \d+|\*+ Case Rubric \d+ of \d+',
-        '',
-        content
-    )
-    # Improved role splitting with lookahead for role patterns
-    parts = re.split(r'\n(?=\s*\b[\w\s/]+:)', cleaned_content)
-
-    if parts:
-        # Process general text
-        section[general_key] = clean_text(parts[0])
-
-        # Process roles with enhanced regex
-        for part in parts[1:]:
-            # Handle multi-line descriptions and special characters
-            role_match = re.match(r'^\s*([\w\s/]+):\s*(.+?)(?=\n\s*[\w\s/]+:|\Z)', part, re.DOTALL)
-            if role_match:
-                role = role_match.group(1).strip()
-                description = clean_text(role_match.group(2))
-                section["roles"][role] = description
-
-    return section
-
-
 def parse_case_study(text):
+    """Main function to parse complete case study from text.
+
+        Args:
+            text (str): Full text content of the case study
+
+        Returns:
+            dict: Structured case study data with keys:
+                  - patient_info
+                  - summary
+                  - team_members
+                  - background
+                  - assessment_plan
+                  - assessment_results
+                  - treatment_plan
+    """
     return {
         "patient_info": extract_patient_info(text),
         "summary": extract_summary(text),
@@ -207,6 +252,16 @@ def parse_case_study(text):
 
 
 def process_zip(zip_path, output_dir="Case_Study_json"):
+    """Process zip archive containing multiple case study text files.
+
+        Args:
+            zip_path (str): Path to input zip file
+            output_dir (str): Directory to save JSON outputs (default: "Case_Study_json")
+
+        Raises:
+            FileNotFoundError: If input zip file doesn't exist
+            zipfile.BadZipFile: If input file is not a valid zip archive
+    """
     # Create output directory if it doesn't exist
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
