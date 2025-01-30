@@ -1,5 +1,9 @@
 import json
 import re
+import os
+
+print(os.getcwd())
+os.chdir("../../../Case_Study_Data")
 
 def parse_case_study(text):
     data = {
@@ -110,7 +114,7 @@ with open('case-study-20.txt', 'r', encoding='utf-8') as f:
 
 result = parse_case_study(text)
 
-with open('output.json', 'w') as f:
+with open('case-study-20.json', 'w') as f:
     json.dump(result, f, indent=2)
 
 print(json.dumps(result, indent=2))
