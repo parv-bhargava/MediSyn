@@ -1,6 +1,8 @@
 import json
 import re
 import os
+import zipfile
+from pathlib import Path
 
 
 def clean_text(t):
@@ -204,16 +206,32 @@ def parse_case_study(text):
     }
 
 
+def process_zip(zip_path, output_dir="Case_Study_json"):
+    # Create output directory if it doesn't exist
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        for file_info in zip_ref.infolist():
+            if file_info.filename.lower().endswith('.txt'):
+                # Read text file content from zip
+                with zip_ref.open(file_info) as file:
+                    text_content = file.read().decode('utf-8')
+
+                    # Process with existing parser
+                    json_data = parse_case_study(text_content)
+
+                    # Create output path
+                    json_filename = Path(file_info.filename).stem + '.json'
+                    output_path = Path(output_dir) / json_filename
+
+                    # Save JSON output
+                    with open(output_path, 'w') as json_file:
+                        json.dump(json_data, json_file, indent=2)
+
 # Usage remains the same
 print(os.getcwd())
 os.chdir("../../../Case_Study_Data")
 
-with open('case-study-20.txt', 'r', encoding='utf-8') as f:
-    text = f.read()
-
-result = parse_case_study(text)
-
-with open('case-study-20.json', 'w') as f:
-    json.dump(result, f, indent=2)
-
-print(json.dumps(result, indent=2))
+input_zip = "case-study-text.zip"  # Replace with your zip file path
+process_zip(input_zip)
+print(f"Processed all files in {input_zip} and saved JSONs to Case_Study_json directory")
