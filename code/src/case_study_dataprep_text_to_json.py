@@ -11,16 +11,7 @@ def parse_case_study(text):
         "summary": "",
         "team_members": [],
         "background": "",
-        "assessment_plan": {
-            "general_plan": "",
-            "Neonatologist/NNP": "",
-            "Pediatric otolaryngologist": "",
-            "NICU nurse": "",
-            "Lactation consultant": "",
-            "SLP": "",
-            "Physical therapy": "",
-            "Family": ""
-        },
+        "assessment_plan": {"general_plan": "", "roles": {}},  # Initialize with just general_plan
         "assessment_results": {"general_results": "", "roles": {}},
         "treatment_plan": {"general_plan": "", "roles": {}}
     }
@@ -61,24 +52,6 @@ def parse_case_study(text):
     if background_match:
         data["background"] = clean_text(background_match.group(1))
 
-    # Assessment Plan
-    assessment_plan_match = re.search(
-        r'Assessment Plan \(Determine roles/ responsibilities for evaluation\)\n\n(.+?)\nContinue for more',
-        text, re.DOTALL
-    )
-    if assessment_plan_match:
-        content = re.sub(r'Go back to Summary\n?', '', assessment_plan_match.group(1))
-        parts = re.split(r'\n(?=\w+.*?:)', content)
-        if parts:
-            data["assessment_plan"]["general_plan"] = clean_text(parts[0])
-            for part in parts[1:]:
-                role_desc = re.match(r'(.+?):\s*(.+?)(?=\n\w+.*?:|$)', part, re.DOTALL)
-                if role_desc:
-                    role = role_desc.group(1).strip()
-                    description = clean_text(role_desc.group(2))
-                    if role in data["assessment_plan"]:
-                        data["assessment_plan"][role] = description
-
     # Section parser with dynamic general key
     def parse_section(pattern, section, general_key):
         match = re.search(pattern, text, re.DOTALL)
@@ -92,14 +65,18 @@ def parse_case_study(text):
                     if role_desc:
                         section["roles"][role_desc.group(1).strip()] = clean_text(role_desc.group(2))
 
-    # Assessment Results with general_results
+    # Assessment Plan, Assessment Results and Treatment Plan
+    parse_section(
+        r'Assessment Plan \(Determine roles/ responsibilities for evaluation\)\n\n(.+?)\nContinue for more',
+        data["assessment_plan"],
+        "general_plan"
+    )
     parse_section(
         r'Assessment Results \(Summarize key diagnostic results\)\n\n(.+?)\nContinue for more',
         data["assessment_results"],
         "general_results"
     )
 
-    # Treatment Plan with general_plan
     parse_section(
         r'IPP Treatment Plan \(Discuss, reflect, and modify recommendations to develop a coordinated plan\)\n\n(.+?)\nContinue for more',
         data["treatment_plan"],
