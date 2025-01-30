@@ -28,9 +28,9 @@ class LLM:
         Load AWS credentials from the environment variables using dotenv.
         """
         load_dotenv()
-        self.aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
-        self.aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-        self.aws_session_token = os.getenv("AWS_SESSION_TOKEN")
+        self.aws_access_key_id = os.getenv("aws_access_key_id")
+        self.aws_secret_access_key = os.getenv("aws_secret_access_key")
+        self.aws_session_token = os.getenv("aws_session_token")
 
     def create_client(self):
         """
