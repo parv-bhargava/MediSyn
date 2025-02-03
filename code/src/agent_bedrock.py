@@ -61,25 +61,44 @@ class LLM:
             self.create_client()
 
         try:
+            # Llama formatted instructions
+            if "instruct" in model_id:
+                body_content["prompt"] = f"""<|begin_of_text|>
+                <|start_header_id|>system<|end_header_id|>
+                You are an expert nurse. 
+                Provide your professional opinion concisely and explain your answers true to your knowledge.<|eot_id|>
+                <|start_header_id|>user<|end_header_id|>
+                {body_content["prompt"]}<|eot_id|>
+                <|start_header_id|>assistant<|end_header_id|>"""
             response = self.client.invoke_model(
                 modelId=model_id,
                 body=json.dumps(body_content),
             )
-            return response['body'].read()
+            # Parse response properly
+            response_body = json.loads(response['body'].read())
+            return response_body['generation'].strip()
+
         except ClientError as e:
-            print(f"Error: {e}")
+            print(f"Error: {e.response['Error']['Message']}")
+            return None
+        except KeyError:
+            print("Unexpected response format from model")
+            return None
+        except json.JSONDecodeError:
+            print("Failed to decode model response")
             return None
 
 
 if __name__ == '__main__':
     client = LLM()
     model_id = "meta.llama3-70b-instruct-v1:0"
+    query = "What's the recommended treatment for migraine?"
+    # query = "I have a fever. What should I do?"
     body_content = {
-        "input": "What is the capital of France?",
-        "parameters": {
-            "temperature": 0.7,
-            "max_tokens": 100
-        }
+        "prompt": query,
+        "temperature": 0.7,  # More creative but focused
+        "max_gen_len": 1024,  # Allow longer responses
+        "top_p": 0.95  # Broader token sampling
     }
     response = client.get_response(model_id, body_content)
     print(response)
