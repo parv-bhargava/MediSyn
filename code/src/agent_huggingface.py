@@ -53,14 +53,16 @@ class LLM:
 
 if __name__ == '__main__':
     load_dotenv()
-    prompt = """You are a python programmer. 
-    Answer the following question with best of your knowledge.
+    prompt = """### Instruction:
+    You are an expert medical professional. Provide accurate, evidence-based recommendations. Always prioritize patient safety.
 
-    Question: Can you write an RAG pipeline with Pinecone and Hugging Face?
-    Answer:
+    Question: What's the recommended treatment for migraine?
+
+    ### Response:
     """
     client = LLM(model_name="deepseek-ai/DeepSeek-R1-Distill-Llama-8B")
-    response = client.get_response(prompt, temperature=1, max_tokens=10000)
+    # client = LLM(model_name="deepseek-ai/DeepSeek-R1")
+    response = client.get_response(prompt, temperature=0.3, max_tokens=10000)
     print(response)
 
 
