@@ -33,7 +33,7 @@ def process_pdf_zip(zip_path: str, output_zip_path: str = "extracted_texts.zip")
                             elements = partition_pdf(
                                 filename=pdf_path,
                                 strategy="auto",
-                                infer_table_structure=False
+                                infer_table_structure=True
                             )
                             extracted_text = "\n\n".join([e.text for e in elements if e.text])
 
@@ -48,8 +48,8 @@ def process_pdf_zip(zip_path: str, output_zip_path: str = "extracted_texts.zip")
                         except Exception as e:
                             print(f"Error processing {file}: {str(e)}")
 
-
+os.chdir("../../../Case_Study_Data")
 process_pdf_zip(
     zip_path="case-study.zip",  # Your input ZIP path
-    output_zip_path="extracted_texts.zip"  # Output in current directory
+    output_zip_path="case-study-text.zip"  # Output in current directory
 )
