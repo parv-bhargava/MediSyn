@@ -3,7 +3,8 @@ import json
 import os
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
-
+import nltk
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 class LLM:
     """
@@ -64,12 +65,11 @@ class LLM:
             # Llama formatted instructions
             if "llama3" in model_id:
                 body_content["prompt"] = f"""<|begin_of_text|>
-                <|start_header_id|>system<|end_header_id|>
-                You are an expert nurse. 
-                Provide your professional opinion concisely and explain your answers true to your knowledge.<|eot_id|>
-                <|start_header_id|>user<|end_header_id|>
-                {body_content["prompt"]}<|eot_id|>
-                <|start_header_id|>assistant<|end_header_id|>"""
+                        <|start_header_id|>system<|end_header_id|>
+                        You are a helpful assistant. Provide accurate and detailed responses.<|eot_id|>
+                        <|start_header_id|>user<|end_header_id|>
+                        {body_content["prompt"]}<|eot_id|>
+                        <|start_header_id|>assistant<|end_header_id|>"""
 
             response = self.client.invoke_model(
                 modelId=model_id,
@@ -145,27 +145,82 @@ class LLM:
             print("Unexpected response format")
             return None
 
+    def generate_treatment_plan(self, case_study_path):
+        with open(case_study_path, 'r', encoding='utf-8') as f:
+            case_data = json.load(f)
+        # Construct detailed prompt
+        team_list = '\n'.join([f"- {role}" for role in case_data['team_members']])
+        prompt = f"""**IPE Case Study Analysis Task**
+
+            **Patient Information**
+            Name: {case_data['patient_info']['name']}
+            Age: {case_data['patient_info']['age']}
+            Diagnoses: {', '.join(case_data['patient_info']['diagnosis'])}
+
+            **Case Summary**
+            {case_data['summary']}
+
+            **Medical Background**
+            {case_data['background']}
+
+            **Assessment Plan**
+            {case_data['assessment_plan']}
+
+            **Assessment Results**
+            {case_data['assessment_results']}
+
+            **Team Members**
+            {team_list}
+
+            **Required Output Format**
+            Create a comprehensive treatment plan with specific recommendations from each team member's perspective.
+            
+            Structure your response using EXACTLY these section headers:
+            {{For each team member}} 
+            [Full Team Member Role Name]: [Recommendations]
+            """
+
+        # Generate response using LLaMA model
+        body_content = {
+            "prompt": prompt,
+            "temperature": 0.3,  # Lower for factual accuracy
+            "max_gen_len": 1500,
+            "top_p": 0.9
+        }
+
+        response = self.get_response(
+            model_id="meta.llama3-70b-instruct-v1:0",
+            body_content=body_content
+        )
+
+        return response
+
+    def save_output(self, case_study_path: str, generated_text: str):
+        """Save generated output with case-specific filename"""
+        output_dir = "outputs"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Extract base filename and create output name
+        base_name = os.path.splitext(os.path.basename(case_study_path))[0]
+        output_filename = f"treatment-plan-{base_name}.json"
+        output_path = os.path.join(output_dir, output_filename)
+
+        output_data = {
+            "source_file": case_study_path,
+            "generated_text": generated_text
+        }
+
+        with open(output_path, 'w') as f:
+            json.dump(output_data, f, indent=2)
+        return output_path
+
+
 if __name__ == '__main__':
     client = LLM()
-    # model_id = "meta.llama3-70b-instruct-v1:0"
-    # model_id = "anthropic.claude-3-5-sonnet-20240620-v1:0"
-    model_id = "anthropic.claude-3-opus-20240229-v1:0"
-    query = "What's the recommended treatment for migraine?"
-    # query = "I have a fever. What should I do?"
-    body_content = {
-        "prompt": query,
-        "temperature": 0.7,  # More creative but focused
-        "max_gen_len": 1024,  # Allow longer responses
-        "top_p": 0.95  # Broader token sampling
-    }
-    # response = client.get_response(model_id, body_content)
-    # print(response)
-    nurse_system_prompt = """You are an expert nurse.
-    Provide your professional opinion concisely and explain your answers true to your knowledge."""
-    response = client.get_claude_response(
-        system_prompt=nurse_system_prompt,
-        user_query=query,
-        max_tokens=1024,
-        temperature=0.2
-    )
-    print(response)
+    os.chdir("../../../Case_Study_Data")
+
+    model_id = "meta.llama3-70b-instruct-v1:0"
+    case_study_path = "case-study-25.json"
+    result = client.generate_treatment_plan(case_study_path)
+    client.save_output(case_study_path, result)
+    print("IPE Treatment Plan Generated and Saved!!")
