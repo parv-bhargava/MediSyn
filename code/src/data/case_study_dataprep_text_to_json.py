@@ -192,7 +192,7 @@ def process_zip(zip_path, output_dir="Case_Study_json"):
 
 
 print(os.getcwd())
-os.chdir("../../../Case_Study_Data")
+os.chdir("../../../../Case_Study_Data")
 
 input_zip = "case-study-text.zip"  # Replace with your zip file path
 process_zip(input_zip)

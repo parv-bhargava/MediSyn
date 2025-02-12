@@ -65,7 +65,7 @@ class TreatmentEvaluator:
 
 if __name__ == '__main__':
     print(os.getcwd())
-    os.chdir("../../../Case_Study_Data")
+    os.chdir("../../../../Case_Study_Data")
     evaluator = TreatmentEvaluator()
     metrics = evaluator.evaluate()
 

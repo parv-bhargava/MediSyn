@@ -48,7 +48,7 @@ def process_pdf_zip(zip_path: str, output_zip_path: str = "extracted_texts.zip")
                         except Exception as e:
                             print(f"Error processing {file}: {str(e)}")
 
-os.chdir("../../../Case_Study_Data")
+os.chdir("../../../../Case_Study_Data")
 process_pdf_zip(
     zip_path="case-study.zip",  # Your input ZIP path
     output_zip_path="case-study-text.zip"  # Output in current directory
