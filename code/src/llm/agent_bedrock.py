@@ -217,7 +217,7 @@ class LLM:
 
 if __name__ == '__main__':
     client = LLM()
-    os.chdir("../../../Case_Study_Data")
+    os.chdir("../../../../Case_Study_Data")
 
     model_id = "meta.llama3-70b-instruct-v1:0"
     case_study_path = "case-study-25.json"
