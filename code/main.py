@@ -1,5 +1,5 @@
 ## user_query ----> LLM ----> response
-from src.agent import LLM
+from src.agent_bedrock import LLM
 user_query = input("Enter your query: ")
 model = LLM()
 response = model.get_response("meta.llama3-70b-instruct-v1:0", {"input": user_query})
