@@ -80,7 +80,7 @@ class InterprofessionalRoundRobinAgentSystem:
         prompt = (
             f"IPE Case Study:\n{case_study}\n\n"
             f"Discussion: {discussion_message}\n\n"
-            "Please provide your interprofessional perspectives on this case."
+            "Create a comprehensive treatment plan with specific recommendations from each team member's perspective."
         )
 
         cancellation_token = CancellationToken()

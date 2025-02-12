@@ -61,7 +61,7 @@ class InterprofessionalAgentSystem:
             [self.nurse_agent, self.physician_agent, self.social_worker_agent],
             model_client=self.model_client_orc,
             termination_condition=termination_condition,
-            final_answer_prompt="Please provide a final treatment plan based on discussion."
+            final_answer_prompt="Create a comprehensive treatment plan with specific recommendations from each team member's perspective."
         )
 
     async def trigger(self, case_study: str, discussion_message: str = None, stream: bool = True):
