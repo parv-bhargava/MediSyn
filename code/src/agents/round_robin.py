@@ -105,17 +105,18 @@ if __name__ == "__main__":
             format="%(asctime)s - %(levelname)s - %(message)s"
         )
         agent_system = InterprofessionalRoundRobinAgentSystem()
-
-        case_study = (
-            "Patient A is a 65-year-old male with a history of hypertension and type 2 diabetes, "
-            "presenting with shortness of breath and chest pain. Examination revealed bilateral rales "
-            "and an S3 heart sound, suggesting congestive heart failure. Further lab tests and imaging are pending."
-        )
-        discussion_message = "Let's have discussion on how we can provide the best care for Patient A."
+        case_data = {
+            "case_study": (
+                "Patient A is a 65-year-old male with a history of hypertension and type 2 diabetes, "
+                "presenting with shortness of breath and chest pain. Examination revealed bilateral rales "
+                "and an S3 heart sound, suggesting congestive heart failure. Further lab tests and imaging are pending."
+            ),
+            "discussion_message": "Let's have discussion on how we can provide the best care for Patient A."
+        }
 
         # # --- Streaming Mode ---
         # print("Streaming Agent Responses:\n")
-        # async for response in agent_system.trigger(case_study, discussion_message, stream=True):
+        # async for response in agent_system.trigger(case_data["case_study"], case_data["case_study"], stream=True):
         #     if isinstance(response, TaskResult):
         #         print("\nTask completed. Stop reason:", response.stop_reason)
         #     else:
@@ -124,7 +125,7 @@ if __name__ == "__main__":
         # --- Aggregated Mode ---
         print("Aggregated Agent Response:\n")
         aggregated_result = ""
-        async for response in agent_system.trigger(case_study, discussion_message, stream=False):
+        async for response in agent_system.trigger(case_data["case_study"], case_data["case_study"], stream=False):
             aggregated_result = response
         print(aggregated_result)
 

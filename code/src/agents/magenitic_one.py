@@ -112,15 +112,18 @@ if __name__ == "__main__":
 
         agent_system = InterprofessionalAgentSystem()
 
-        case_study = (
-            "Patient A is a 65-year-old male with a history of hypertension and type 2 diabetes, "
-            "presenting with shortness of breath and chest pain. Examination revealed bilateral rales "
-            "and an S3 heart sound, suggesting congestive heart failure. Further lab tests and imaging are pending."
-        )
+        case_data = {
+            "case_study": (
+                "Patient A is a 65-year-old male with a history of hypertension and type 2 diabetes, "
+                "presenting with shortness of breath and chest pain. Examination revealed bilateral rales "
+                "and an S3 heart sound, suggesting congestive heart failure. Further lab tests and imaging are pending."
+            ),
+            "discussion_message": "Let's have discussion on how we can provide the best care for Patient A."
+        }
 
         # --- Streaming Mode ---
         print("Triggering agent system in streaming mode:\n")
-        async for response in agent_system.trigger(case_study=case_study, stream=True):
+        async for response in agent_system.trigger(case_study=case_data["case_study"], stream=True):
             if isinstance(response, TaskResult):
                 print("\nTask completed. Stop reason:", response.stop_reason)
             else:
@@ -129,7 +132,7 @@ if __name__ == "__main__":
         # # --- Aggregated Mode ---
         # print("\nTriggering agent system in aggregated (non-streaming) mode:\n")
         # aggregated_messages = ""
-        # async for response in agent_system.trigger(case_study=case_study, stream=False):
+        # async for response in agent_system.trigger(case_study=case_data["case_study"], stream=False):
         #     aggregated_messages = response
         # print(aggregated_messages)
 
