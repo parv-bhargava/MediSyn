@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 
@@ -9,6 +10,10 @@ from autogen_agentchat.teams import MagenticOneGroupChat
 from autogen_core import CancellationToken
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
+
+current_dir = os.path.dirname(__file__)
+json_path = os.path.join(current_dir, '..', 'data', 'case-study.json')
+CASE_STUDY_PATH = os.path.abspath(json_path)
 
 
 class InterprofessionalAgentSystem:
@@ -61,33 +66,17 @@ class InterprofessionalAgentSystem:
             [self.nurse_agent, self.physician_agent, self.social_worker_agent],
             model_client=self.model_client_orc,
             termination_condition=termination_condition,
-            final_answer_prompt="Create a comprehensive treatment plan with specific recommendations from each team member's perspective."
+            final_answer_prompt="""            
+            **Required Output Format**
+            Create a comprehensive treatment plan with specific recommendations from each team member's perspective.
+
+            Structure your response using EXACTLY these section headers:
+            {{For each team member}} 
+            [Full Team Member Role Name]: [Recommendations]"""
+
         )
 
-    async def trigger(self, case_study: str, discussion_message: str = None, stream: bool = True):
-        """
-        Trigger the agent system with the provided case study and discussion message.
-
-        Args:
-            case_study (str): The case study details.
-            discussion_message (str, optional): An additional discussion prompt.
-                Defaults to a preset message if not provided.
-            stream (bool, optional): If True, yields messages as they are generated.
-                If False, aggregates the response and yields a single final result.
-
-        Yields:
-            When stream is True: yields messages (or TaskResult) as they are produced.
-            When stream is False: yields one aggregated string containing all agent responses.
-        """
-        if discussion_message is None:
-            discussion_message = "Let's have a discussion on how we can provide the best care for this case."
-
-        prompt = (
-            f"IPE Case Study:\n{case_study}\n\n"
-            f"Discussion: {discussion_message}\n\n"
-            "Please provide your interprofessional perspectives on this case."
-        )
-
+    async def trigger(self, prompt: str, discussion_message: str = None, stream: bool = True):
         cancellation_token = CancellationToken()
         stream_obj = self.team.run_stream(task=prompt, cancellation_token=cancellation_token)
 
@@ -103,6 +92,54 @@ class InterprofessionalAgentSystem:
 
 
 if __name__ == "__main__":
+    def generate_prompt(case_study_path):
+        with open(case_study_path, 'r', encoding='utf-8') as f:
+            case_data = json.load(f)
+        # Construct detailed prompt
+        team_list = '\n'.join([f"- {role}" for role in case_data['team_members']])
+        prompt = f"""**IPE Case Study Analysis Task**
+
+            **Patient Information**
+            Name: {case_data['patient_info']['name']}
+            Age: {case_data['patient_info']['age']}
+            Diagnoses: {', '.join(case_data['patient_info']['diagnosis'])}
+
+            **Case Summary**
+            {case_data['summary']}
+
+            **Medical Background**
+            {case_data['background']}
+
+            **Assessment Plan**
+            {case_data['assessment_plan']}
+
+            **Assessment Results**
+            {case_data['assessment_results']}
+
+            **Team Members**
+            {team_list}
+            """
+        return prompt
+
+    def save_output(case_study_path: str, generated_text: str):
+        """Save generated output with case-specific filename"""
+        output_dir = "outputs"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Extract base filename and create output name
+        base_name = os.path.splitext(os.path.basename(case_study_path))[0]
+        output_filename = f"treatment-plan-{base_name}.json"
+        output_path = os.path.join(output_dir, output_filename)
+
+        output_data = {
+            "source_file": case_study_path,
+            "generated_text": generated_text
+        }
+        with open(output_path, 'w') as f:
+            json.dump(output_data, f, indent=2)
+        return output_path
+
+
     async def main():
         logging.basicConfig(
             filename="agent_discussion.log",
@@ -111,30 +148,23 @@ if __name__ == "__main__":
         )
 
         agent_system = InterprofessionalAgentSystem()
-
-        case_data = {
-            "case_study": (
-                "Patient A is a 65-year-old male with a history of hypertension and type 2 diabetes, "
-                "presenting with shortness of breath and chest pain. Examination revealed bilateral rales "
-                "and an S3 heart sound, suggesting congestive heart failure. Further lab tests and imaging are pending."
-            ),
-            "discussion_message": "Let's have discussion on how we can provide the best care for Patient A."
-        }
+        prompt = generate_prompt(CASE_STUDY_PATH)
 
         # --- Streaming Mode ---
-        print("Triggering agent system in streaming mode:\n")
-        async for response in agent_system.trigger(case_study=case_data["case_study"], stream=True):
-            if isinstance(response, TaskResult):
-                print("\nTask completed. Stop reason:", response.stop_reason)
-            else:
-                print(f"{response.source}:\n{response.content}\n")
+        # print("Triggering agent system in streaming mode:\n")
+        # async for response in agent_system.trigger(prompt=prompt, stream=True):
+        #     if isinstance(response, TaskResult):
+        #         print("\nTask completed. Stop reason:", response.stop_reason)
+        #     else:
+        #         print(f"{response.source}:\n{response.content}\n")
 
         # # --- Aggregated Mode ---
-        # print("\nTriggering agent system in aggregated (non-streaming) mode:\n")
-        # aggregated_messages = ""
-        # async for response in agent_system.trigger(case_study=case_data["case_study"], stream=False):
-        #     aggregated_messages = response
-        # print(aggregated_messages)
+        print("\nTriggering agent system in aggregated (non-streaming) mode:\n")
+        aggregated_messages = ""
+        async for response in agent_system.trigger(prompt=prompt, stream=False):
+            aggregated_messages = response
+            save_output(CASE_STUDY_PATH, aggregated_messages)
+        print(aggregated_messages)
 
 
     asyncio.run(main())
