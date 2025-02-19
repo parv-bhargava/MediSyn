@@ -12,7 +12,7 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
 
 current_dir = os.path.dirname(__file__)
-json_path = os.path.join(current_dir, '..', 'data', 'case-study.json')
+json_path = os.path.join(current_dir, '..', 'data', 'case-study-25.json')
 CASE_STUDY_PATH = os.path.abspath(json_path)
 
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     def save_output(case_study_path: str, generated_text: str):
         """Save generated output with case-specific filename"""
-        output_dir = "outputs"
+        output_dir = "../data/outputs"
         os.makedirs(output_dir, exist_ok=True)
 
         # Extract base filename and create output name
