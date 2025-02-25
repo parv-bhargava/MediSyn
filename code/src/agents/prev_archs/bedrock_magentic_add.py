@@ -36,7 +36,7 @@ class InterprofessionalAgentSystem:
         # Create the Ollama client.
         sk_client = BedrockChatCompletion(
             model_id=ai_model_id,
-            env_file_path=".env",
+            env_file_path="../.env",
         )
         bedrock_settings = BedrockChatPromptExecutionSettings(
             temperature=temperature,
@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
     def save_output(case_study_path: str, generated_text: str):
         """Save generated output with case-specific filename"""
-        output_dir = "../data/outputs"
+        output_dir = "../../data/outputs"
         os.makedirs(output_dir, exist_ok=True)
 
         # Extract base filename and create output name

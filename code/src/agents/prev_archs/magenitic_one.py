@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     def save_output(case_study_path: str, generated_text: str):
         """Save generated output with case-specific filename"""
-        output_dir = "../data/outputs"
+        output_dir = "../../data/outputs"
         os.makedirs(output_dir, exist_ok=True)
 
         # Extract base filename and create output name

@@ -119,7 +119,7 @@ graph.add_edge("social_worker", "synthesis")
 graph.add_edge("synthesis", END)
 
 workflow = graph.compile()
-case_study_prompt = generate_prompt("../data/case-study-25.json")
+case_study_prompt = generate_prompt("../../data/case-study-25.json")
 
 initial_state: PatientState = {
     "case_study": case_study_prompt,
@@ -135,7 +135,7 @@ print("\nFinal Treatment Plan:\n", final_state.get("treatment_plan"))
 
 def save_output(case_study_path: str, generated_text: str):
     """Save generated output with case-specific filename"""
-    output_dir = "../data/outputs"
+    output_dir = "../../data/outputs"
     os.makedirs(output_dir, exist_ok=True)
 
     base_name = os.path.splitext(os.path.basename(case_study_path))[0]
@@ -151,4 +151,4 @@ def save_output(case_study_path: str, generated_text: str):
     return output_path
 
 
-save_output("../data/case-study-25.json", final_state.get("treatment_plan"))
+save_output("../../data/case-study-25.json", final_state.get("treatment_plan"))
