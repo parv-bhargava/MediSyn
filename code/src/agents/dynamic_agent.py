@@ -34,7 +34,7 @@ class DynamicAgentManager:
         self.memory = {}
         self.event_queue = []
 
-    def _agent_prompt_generator(self, role):
+    def _agent_prompt_generator(self, role: object) -> str:
         """
         Generates a dynamic prompt based on the provided role. The method uses
         an instance of the Agent class to construct and execute the prompt
@@ -51,7 +51,7 @@ class DynamicAgentManager:
         generated_prompt = prompt_generator.run()
         return generated_prompt
 
-    def _create_and_deploy_agent(self, role, base_prompt):
+    def _create_and_deploy_agent(self, role: object, base_prompt: object) -> str:
         """
         Creates and deploys an agent based on the provided role and base prompt. The method
         generates a prompt for the agent, creates an instance of the `Agent` class with the
@@ -76,7 +76,7 @@ class DynamicAgentManager:
         print(f"[{datetime.now()}] {agent.name} created and scheduled for deployment.")
         return agent.name
 
-    def _create_and_deploy_synthesis_agent(self):
+    def _create_and_deploy_synthesis_agent(self) -> str:
         """
         Creates and deploys a synthesis agent by aggregating responses from other agents,
         generating a synthesis prompt, and scheduling the new agent for deployment.
@@ -87,6 +87,7 @@ class DynamicAgentManager:
         initializes the agent. Finally, the agent is stored, scheduled for deployment,
         and its name is returned.
 
+        :return: 
         :param self: The current instance of the class.
         :return: The name of the newly created synthesis agent as a string.
         :rtype: str
@@ -110,7 +111,7 @@ class DynamicAgentManager:
         print(f"[{datetime.now()}] {synthesis_agent.name} created and scheduled for deployment.")
         return synthesis_agent.name
 
-    def _execute_agents(self):
+    def _execute_agents(self) -> None:
         """
         Executes all agents present in the event queue and processes their actions based
         on the event type. This function iterates through the event queue, dispatches
@@ -129,7 +130,7 @@ class DynamicAgentManager:
                 self.memory[agent.name] = response
                 print(f"[{datetime.now()}] {agent.name} executed. Response stored.")
 
-    def run_manager(self, roles, base_prompt, synthesis=False):
+    def run_manager(self, roles: object, base_prompt: object, synthesis: object = False) -> None:
         """
         Executes a sequence of operations by creating and deploying agents based on the
         provided roles and base prompt. Optionally creates and deploys a synthesis agent
