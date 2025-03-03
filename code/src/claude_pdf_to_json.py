@@ -171,14 +171,6 @@ class PDFProcessor:
 
         return ""
 
-    # def process_batch(self, file_list):
-    #     """Process multiple PDF files"""
-    #     results = {}
-    #     for pdf_path in file_list:
-    #         output = self.process_pdf(pdf_path)
-    #         if output:
-    #             results[pdf_path] = output
-    #     return results
 
     def save_to_file(self, data, output_path):
         """Save processed data to JSON file"""
@@ -224,8 +216,4 @@ if __name__ == "__main__":
             print(f"Failed to process {base_name}")
 
     print("\nBatch processing complete!")
-    # Process single file
-    # single_result = processor.process_pdf("case-study-02.pdf")
-    # if single_result:
-    #     processor.save_to_file(single_result, "output.json")
 
