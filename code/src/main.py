@@ -87,5 +87,4 @@ if __name__ == "__main__":
     # Evaluate
     evaluator = TreatmentEvaluator()
     df_metrics = evaluator.evaluate(output_dir="data/outputs", reference_dir="data")
-    print(f"\nEvaluation Results:")
-    print(df_metrics)
+    df_metrics.to_excel("evaluation_results.xlsx")

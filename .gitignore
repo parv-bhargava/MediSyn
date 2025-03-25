@@ -170,3 +170,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 code/src/data/outputs/
+code/src/evaluation_results.xlsx
+*.xlsx

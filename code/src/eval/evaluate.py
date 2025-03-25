@@ -82,4 +82,4 @@ if __name__ == '__main__':
     df_metrics = evaluator.evaluate(output_dir="outputs", reference_dir=".")
 
     print("\nEvaluation Results DataFrame:")
-    print(df_metrics)
+    df_metrics.to_excel("evaluation_results.xlsx")
