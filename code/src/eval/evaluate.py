@@ -79,7 +79,5 @@ if __name__ == '__main__':
     print("Changed working directory to:", os.getcwd())
 
     evaluator = TreatmentEvaluator()
-    df_metrics = evaluator.evaluate(output_dir="outputs", reference_dir=".")
-
-    print("\nEvaluation Results DataFrame:")
+    df_metrics = evaluator.evaluate(output_dir="outputs", reference_dir="casestudy")
     df_metrics.to_excel("evaluation_results.xlsx")
