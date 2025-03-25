@@ -4,7 +4,7 @@ import nltk
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
 
-nltk.download('punkt_tab')
+# nltk.download('punkt_tab')
 
 class TreatmentEvaluator:
     def __init__(self):

@@ -1,8 +1,8 @@
 # Dynamic agent manager that creates and deploys agents based on roles and prompts.
 from datetime import datetime
 
-from base_agent import AgentGPT
-from configs import PROMPT_GENERATOR_PROMPT
+from agents.base_agent import Agent
+from agents.configs import PROMPT_GENERATOR_PROMPT
 
 
 class DynamicAgentManager:
@@ -27,12 +27,16 @@ class DynamicAgentManager:
     :ivar event_queue: A list-based event queue for scheduling actions such as
                        deployment of agents. It ensures correct processing order.
     :type event_queue: list
+
+    :ivar model_id: The model ID used for agent creation and execution.
+    :type model_id: str
     """
 
-    def __init__(self):
+    def __init__(self, model_id=None):
         self.agents = {}
         self.memory = {}
         self.event_queue = []
+        self.model_id = model_id
 
     def _agent_prompt_generator(self, role: object) -> str:
         """
@@ -46,7 +50,8 @@ class DynamicAgentManager:
         :return: The generated prompt based on the given role.
         :rtype: str
         """
-        prompt_generator = AgentGPT(name="PROMPT_GENERATOR", role=PROMPT_GENERATOR_PROMPT.format(role))
+        prompt_generator = Agent(name="PROMPT_GENERATOR", role=PROMPT_GENERATOR_PROMPT.format(role),
+                                 model_id=self.model_id)
         generated_prompt = prompt_generator.run()
         return generated_prompt
 
@@ -66,7 +71,7 @@ class DynamicAgentManager:
         """
         role_prompt = self._agent_prompt_generator(role)
         agent_name = f"Agent_{role}"
-        agent = AgentGPT(name=agent_name, role=role_prompt, conversation=conversation)
+        agent = Agent(name=agent_name, role=role_prompt, conversation=conversation, model_id=self.model_id)
         self.agents[agent.name] = agent
         self.event_queue.append(('deploy', agent))
         print(f"[{datetime.now()}] {agent.name} created and scheduled for deployment.")
@@ -100,8 +105,8 @@ class DynamicAgentManager:
             f"{combined_responses}"
         )
         synthesis_system_prompt = self._agent_prompt_generator("synthesis")
-        synthesis_agent = AgentGPT(name="SYNTHESIS_AGENT", role=synthesis_system_prompt,
-                                conversation=synthesis_base_prompt)
+        synthesis_agent = Agent(name="SYNTHESIS_AGENT", role=synthesis_system_prompt,
+                                conversation=synthesis_base_prompt, model_id=self.model_id)
         self.agents[synthesis_agent.name] = synthesis_agent
         self.event_queue.append(('deploy', synthesis_agent))
         print(f"[{datetime.now()}] {synthesis_agent.name} created and scheduled for deployment.")
@@ -147,3 +152,15 @@ class DynamicAgentManager:
         if synthesis:
             self._create_and_deploy_synthesis_agent()
             self._execute_agents()
+
+
+if __name__ == "__main__":
+    manager = DynamicAgentManager(model_id="anthropic.claude-3-5-sonnet-20240620-v1:0")
+    roles = ["chemist", "engineer", "physicist"]
+    base_prompt = "Develop a new technology based on the following specifications:"
+    manager.run_manager(roles, base_prompt, synthesis=True)
+    print("\nStored Agent Responses:")
+    for agent_name, response in manager.memory.items():
+        print(f"Agent ID: {agent_name}\nResponse: {response}\n")
+        if agent_name == "SYNTHESIS_AGENT":
+            print(f"Synthesized Response: {response}")

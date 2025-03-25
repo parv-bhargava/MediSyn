@@ -1,7 +1,7 @@
 import json
 import os
-from dynamic_agent import DynamicAgentManager
 
+from agents.dynamic_agent import DynamicAgentManager
 
 def generate_prompt(case_study_path):
     with open(case_study_path, 'r', encoding='utf-8') as f:
@@ -32,7 +32,7 @@ def generate_prompt(case_study_path):
 
 def save_output(case_study_path: str, generated_text: str):
     """Save generated output with case-specific filename"""
-    output_dir = "../data/outputs"
+    output_dir = "data/outputs"
     os.makedirs(output_dir, exist_ok=True)
 
     # Extract base filename and create output name
@@ -50,18 +50,25 @@ def save_output(case_study_path: str, generated_text: str):
 
 
 def main():
-    case_study, team_list = generate_prompt("../data/case-study-25.json")
-    # TODO: Create regex for team_list
+    case_study, team_list = generate_prompt("data/case-study-25.json")
     roles = ["physician", "oncologist", "nurse"]
     base_prompt = "Prepare a treatment plan for this case study. " + case_study
+    model_ids = ["anthropic.claude-3-5-sonnet-20240620-v1:0","meta.llama3-70b-instruct-v1:0"]
+    for model_id in model_ids:
+        manager = DynamicAgentManager(model_id=model_id)
+        manager.run_manager(roles, base_prompt, synthesis=True)
 
-    manager = DynamicAgentManager()
+        print("\nStored Agent Responses:")
+        for agent_name, response in manager.memory.items():
+            print(f"Agent ID: {agent_name}\nResponse: {response}\n")
+
+    manager = DynamicAgentManager(model_id="gpt-4o")
     manager.run_manager(roles, base_prompt, synthesis=True)
 
     print("\nStored Agent Responses:")
     for agent_name, response in manager.memory.items():
         print(f"Agent ID: {agent_name}\nResponse: {response}\n")
         if agent_name == "SYNTHESIS_AGENT":
-            save_output("../data/case-study-25.json", response)
+            save_output("data/case-study-25.json", response)
 if __name__ == "__main__":
     main()
