@@ -29,69 +29,51 @@ class Agent:
     def run(self):
         """
         Execute the agent's task by delegating to the appropriate runner.
-        Passes the agent's id and model_id to the runner.
+        Passes the agent object to the corresponding runner.
         """
         if self.model_id in ["gpt-4o", "gpt-4o-turbo"]:
-            return RunnerGPT(
-                agent_id=self.name,
-                role=self.role,
-                conversation=self.conversation,
-                model_id=self.model_id
-            ).run()
+            return RunnerGPT(self).run()
         elif self.model_id in ["meta.llama3-70b-instruct-v1:0", "anthropic.claude-3-5-sonnet-20240620-v1:0"]:
-            return RunnerBedrock(
-                agent_id=self.name,
-                role=self.role,
-                conversation=self.conversation,
-                model_id=self.model_id
-            ).run()
+            return RunnerBedrock(self).run()
         else:
             raise ValueError("Unsupported model ID.")
 
 
-class RunnerGPT(Agent):
-    def __init__(self, agent_id, role, conversation, model_id):
+class RunnerGPT:
+    def __init__(self, agent: Agent):
         """
-        Initialize a RunnerGPT instance with OpenAI's GPT settings.
+        Initialize a RunnerGPT instance with an Agent instance.
 
-        :param agent_id: The identifier of the agent.
-        :param role: The system prompt.
-        :param conversation: The conversation text.
-        :param model_id: The model identifier.
+        :param agent: An instance of Agent containing role, conversation, and model_id.
         """
-        super().__init__(agent_id, role, conversation, model_id)
+        self.agent = agent
 
     def run(self):
         """
         Execute the agent's task using OpenAI's GPT API.
         """
-        time.sleep(1)  # simulate delay
         response = openai_client.chat.completions.create(
-            model="gpt-4o",
+            model=self.agent.model_id,
             messages=[
-                {"role": "system", "content": self.role},
-                {"role": "user", "content": self.conversation},
+                {"role": "system", "content": self.agent.role},
+                {"role": "user", "content": self.agent.conversation},
             ]
         ).choices[0].message.content
 
         return response if response else "No response."
 
 
-class RunnerBedrock(Agent):
-    def __init__(self, agent_id, role, conversation="No Conversation", model_id=None, region_name="us-east-1"):
+class RunnerBedrock:
+    def __init__(self, agent: Agent, region_name="us-east-1"):
         """
-        Initialize a RunnerBedrock instance with AWS Bedrock settings.
+        Initialize a RunnerBedrock instance with an Agent instance and AWS Bedrock settings.
 
-        :param agent_id: The identifier of the agent.
-        :param role: The system prompt.
-        :param conversation: The conversation text.
-        :param model_id: The Bedrock model identifier.
+        :param agent: An instance of Agent containing role, conversation, and model_id.
         :param region_name: AWS region name.
         """
-        super().__init__(agent_id, role, conversation, model_id)
+        self.agent = agent
         self.region_name = region_name
         self.client = None
-        self.model_id = model_id  # set the model id from parameter
         self.temperature = 0.7
         self.max_tokens = 1500
         self._load_credentials()
@@ -118,7 +100,7 @@ class RunnerBedrock(Agent):
         """
         Configure the model ID for inference.
         """
-        self.model_id = model_id
+        self.agent.model_id = model_id
 
     def set_temperature(self, temperature):
         """
@@ -135,26 +117,26 @@ class RunnerBedrock(Agent):
     def run(self):
         """
         Execute the agent's task using AWS Bedrock.
-        Combines self.role and self.conversation before sending the request.
+        Combines agent's role and conversation before sending the request.
         """
-        combined_prompt = f"{self.role}\n{self.conversation}"
+        combined_prompt = f"{self.agent.role}\n{self.agent.conversation}"
         if not self.client:
             raise ValueError("AWS client not initialized.")
-        if not self.model_id:
+        if not self.agent.model_id:
             raise ValueError("Model ID is not set.")
 
-        if "anthropic.claude" in self.model_id:
+        if "anthropic.claude" in self.agent.model_id:
             self.set_max_tokens(5000)
             body_content = {
                 "anthropic_version": "bedrock-2023-05-31",
-                "system": self.role,
+                "system": self.agent.role,
                 "messages": [
                     {
                         "role": "user",
                         "content": [
                             {
                                 "type": "text",
-                                "text": self.conversation
+                                "text": self.agent.conversation
                             }
                         ]
                     }
@@ -164,11 +146,11 @@ class RunnerBedrock(Agent):
             }
             try:
                 response = self.client.invoke_model(
-                    modelId=self.model_id,
+                    modelId=self.agent.model_id,
                     body=json.dumps(body_content)
                 )
                 response_body = json.loads(response['body'].read().decode())
-                print(f"Response from Bedrock (Claude) for agent {self.name}: {response_body}")
+                print(f"Response from Bedrock (Claude) for agent {self.agent.name}: {response_body}")
                 return response_body['content'][0]['text'].strip()
             except ClientError as e:
                 print(f"Error: {e.response['Error']['Message']}")
@@ -177,7 +159,7 @@ class RunnerBedrock(Agent):
                 print("Unexpected response format or failed to decode response for Claude model")
                 return None
 
-        elif "llama" in self.model_id.lower():
+        elif "llama" in self.agent.model_id.lower():
             body_content = {
                 "prompt": combined_prompt,
                 "temperature": self.temperature,
@@ -186,11 +168,11 @@ class RunnerBedrock(Agent):
             }
             try:
                 response = self.client.invoke_model(
-                    modelId=self.model_id,
+                    modelId=self.agent.model_id,
                     body=json.dumps(body_content)
                 )
                 response_body = json.loads(response['body'].read().decode())
-                print(f"Response from Bedrock (LLama) for agent {self.name}: {response_body}")
+                print(f"Response from Bedrock (LLama) for agent {self.agent.name}: {response_body}")
                 return response_body['generation'].strip()
             except ClientError as e:
                 print(f"Error: {e.response['Error']['Message']}")
@@ -202,7 +184,6 @@ class RunnerBedrock(Agent):
             raise ValueError("Unsupported model type. Please use a Claude or Llama model.")
 
 
-# Example usage:
 if __name__ == "__main__":
     try:
         # Example with a Claude model:
@@ -212,9 +193,9 @@ if __name__ == "__main__":
             conversation="Extract the key details from the provided document.",
             model_id="anthropic.claude-3-5-sonnet-20240620-v1:0"
         )
-
         print("AgentClaude response (Claude):", agent_claude.run())
 
+        # Example with a GPT model:
         agent_gpt = Agent(
             name="AgentGPT",
             role="You are a creative storyteller.",
@@ -223,11 +204,13 @@ if __name__ == "__main__":
         )
         print("AgentGPT response:", agent_gpt.run())
 
+        # Example with a LLama model:
         agent_llama = Agent(
             name="AgentLLama",
             role="You are a medical document processor.",
             conversation="Extract the key details from the provided document.",
             model_id="meta.llama3-70b-instruct-v1:0"
         )
+        print("AgentLLama response (LLama):", agent_llama.run())
     except ValueError as e:
         print("Initialization error:", e)
