@@ -6,6 +6,7 @@ import pandas as pd
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
 
+
 class TreatmentEvaluator:
     def __init__(self):
         # nltk.download('punkt', quiet=True)
@@ -67,7 +68,6 @@ class TreatmentEvaluator:
                     "rouge2": rouge['rouge2'].fmeasure,
                     "rougeL": rouge['rougeL'].fmeasure
                 })
-
 
         df = pd.DataFrame(results)
         return df
