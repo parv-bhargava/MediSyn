@@ -100,8 +100,8 @@ class DynamicAgentManager:
              for name, agent in self.agents.items()
              if not agent.name.startswith("Synthesis")]
         )
-        # print(combined_responses, type(combined_responses))
-        combined_responses=''.join(combined_responses.split()[:200])
+        # # print(combined_responses, type(combined_responses))
+        # combined_responses=''.join(combined_responses.split()[:200])
         synthesis_base_prompt = (
             f"Based on the following agent responses, synthesize a final treatment plan:\n\n"
             f"{combined_responses}"
