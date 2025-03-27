@@ -3,6 +3,8 @@ import os
 import time
 import json
 import boto3
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from botocore.exceptions import ClientError
 
 from openai import OpenAI
@@ -35,6 +37,8 @@ class Agent:
             return RunnerGPT(self).run()
         elif self.model_id in ["meta.llama3-70b-instruct-v1:0", "anthropic.claude-3-5-sonnet-20240620-v1:0"]:
             return RunnerBedrock(self).run()
+        elif self.model_id.startswith("hf:"):
+            return RunnerHF(self).run()
         else:
             raise ValueError("Unsupported model ID.")
 
@@ -182,6 +186,41 @@ class RunnerBedrock:
                 return None
         else:
             raise ValueError("Unsupported model type. Please use a Claude or Llama model.")
+
+
+class RunnerHF:
+    def __init__(self, agent: Agent):
+        """
+        Initialize a RunnerHF instance with an Agent instance.
+
+        :param agent: An instance of Agent containing role, conversation, and model_id.
+        """
+        self.agent = agent
+
+    def run(self):
+        """
+        Execute the agent's task using a Hugging Face model.
+        This method inlines the LLM functionality to load the model, tokenize the prompt,
+        and generate a response.
+        """
+        prompt = f"{self.agent.role}\n{self.agent.conversation}"
+        model_name = self.agent.model_id.replace("hf:", "")
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"Loading model: {model_name} on {device}")
+
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
+
+        inputs = tokenizer(prompt, return_tensors="pt").to(device)
+        output = model.generate(
+            inputs.input_ids,
+            max_length=100,
+            temperature=0.7,
+            pad_token_id=tokenizer.eos_token_id
+        )
+        response = tokenizer.decode(output[0], skip_special_tokens=True)
+        return response
 
 
 if __name__ == "__main__":
