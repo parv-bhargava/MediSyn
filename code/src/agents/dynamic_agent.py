@@ -2,7 +2,7 @@
 from datetime import datetime
 
 from agents.base_agent import Agent
-from agents.configs import PROMPT_GENERATOR_PROMPT
+from configs.configs import PROMPT_GENERATOR_PROMPT ,SYNTHESIS_AGENT_PROMPT
 
 
 class DynamicAgentManager:
@@ -100,11 +100,13 @@ class DynamicAgentManager:
              for name, agent in self.agents.items()
              if not agent.name.startswith("Synthesis")]
         )
+        # print(combined_responses, type(combined_responses))
+        combined_responses=''.join(combined_responses.split()[:200])
         synthesis_base_prompt = (
             f"Based on the following agent responses, synthesize a final treatment plan:\n\n"
             f"{combined_responses}"
         )
-        synthesis_system_prompt = self._agent_prompt_generator("synthesis")
+        synthesis_system_prompt = SYNTHESIS_AGENT_PROMPT
         synthesis_agent = Agent(name="SYNTHESIS_AGENT", role=synthesis_system_prompt,
                                 conversation=synthesis_base_prompt, model_id=self.model_id)
         self.agents[synthesis_agent.name] = synthesis_agent
@@ -148,14 +150,16 @@ class DynamicAgentManager:
         """
         for role in roles:
             self._create_and_deploy_agent(role, conversation)
+        # Execute all agents
         self._execute_agents()
+        # If synthesis is enabled, create and deploy a synthesis agent
         if synthesis:
             self._create_and_deploy_synthesis_agent()
             self._execute_agents()
 
 
 if __name__ == "__main__":
-    manager = DynamicAgentManager(model_id="anthropic.claude-3-5-sonnet-20240620-v1:0")
+    manager = DynamicAgentManager(model_id="meta.llama3-70b-instruct-v1:0")
     roles = ["chemist", "engineer", "physicist"]
     base_prompt = "Develop a new technology based on the following specifications:"
     manager.run_manager(roles, base_prompt, synthesis=True)
