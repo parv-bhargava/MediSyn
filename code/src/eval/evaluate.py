@@ -50,7 +50,7 @@ class TreatmentEvaluator:
                 llm_as_judge = ast.literal_eval(self.llm_as_judge(generated, reference, model_id))
                 llm_as_judge_score = llm_as_judge.get('score')
                 assert isinstance(llm_as_judge_score, float), f"Expected float, got {type(llm_as_judge_score)}"
-                return int(llm_as_judge_score)
+                return llm_as_judge_score
             except (ValueError, SyntaxError, AssertionError) as e:
                 retry_count += 1
                 print(f"Attempt {retry_count} failed: {e}")
