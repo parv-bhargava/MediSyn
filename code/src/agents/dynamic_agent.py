@@ -55,23 +55,23 @@ class DynamicAgentManager:
         generated_prompt = prompt_generator.run()
         return generated_prompt
 
-    def _create_and_deploy_agent(self, role: str, conversation: str) -> str:
+    def _create_and_deploy_agent(self, role: str, input: str) -> str:
         """
-        Creates and deploys an agent based on the given role and conversation parameters. This function
+        Creates and deploys an agent based on the given role and input parameters. This function
         generates a specific prompt for the agent's role, constructs the agent, adds it to the internal
         agents dictionary, schedules its deployment by appending it to the event queue, and logs creation
         information. Finally, it returns the name of the created agent.
 
         :param role: The role assigned to the agent to determine its behavior.
         :type role: str
-        :param conversation: Initial conversation or context associated with the agent.
-        :type conversation: str
+        :param input: Initial input or context associated with the agent.
+        :type input: str
         :return: The name of the created and deployed agent.
         :rtype: str
         """
         role_prompt = self._agent_prompt_generator(role)
         agent_name = f"Agent_{role}"
-        agent = Agent(name=agent_name, role=role_prompt, conversation=conversation, model_id=self.model_id)
+        agent = Agent(name=agent_name, role=role_prompt, input=input, model_id=self.model_id)
         self.agents[agent.name] = agent
         self.event_queue.append(('deploy', agent))
         print(f"[{datetime.now()}] {agent.name} created and scheduled for deployment.")
@@ -106,7 +106,7 @@ class DynamicAgentManager:
         )
         synthesis_system_prompt = self._agent_prompt_generator("synthesis")
         synthesis_agent = Agent(name="SYNTHESIS_AGENT", role=synthesis_system_prompt,
-                                conversation=synthesis_base_prompt, model_id=self.model_id)
+                                input=synthesis_base_prompt, model_id=self.model_id)
         self.agents[synthesis_agent.name] = synthesis_agent
         self.event_queue.append(('deploy', synthesis_agent))
         print(f"[{datetime.now()}] {synthesis_agent.name} created and scheduled for deployment.")
@@ -131,23 +131,23 @@ class DynamicAgentManager:
                 self.memory[agent.name] = response
                 print(f"[{datetime.now()}] {agent.name} executed. Response stored.")
 
-    def run_manager(self, roles: [str], conversation: str, synthesis: object = False) -> None:
+    def run_manager(self, roles: [str], input: str, synthesis: object = False) -> None:
         """
-        Executes and manages multiple agents based on the provided roles and conversation. Optionally,
+        Executes and manages multiple agents based on the provided roles and input. Optionally,
         handles a synthesis process if specified. This function orchestrates the creation, deployment,
         and execution of agents.
 
         :param roles: A list of roles that determines the agents to be created and deployed.
         :type roles: list[str]
-        :param conversation: The conversation content that agents use as context.
-        :type conversation: str
+        :param input: The input content that agents use as context.
+        :type input: str
         :param synthesis: Optional flag to indicate whether a synthesis agent should be created and executed.
         Defaults to False.
         :type synthesis: bool
         :return: None
         """
         for role in roles:
-            self._create_and_deploy_agent(role, conversation)
+            self._create_and_deploy_agent(role, input)
         self._execute_agents()
         if synthesis:
             self._create_and_deploy_synthesis_agent()

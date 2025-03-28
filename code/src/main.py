@@ -68,8 +68,9 @@ def save_output(case_study_path: str, generated_text: str, tag: str = ""):
 
 def main():
     model_ids = [
-        "meta.llama3-70b-instruct-v1:0",
-        "anthropic.claude-3-5-sonnet-20240620-v1:0"
+        # "meta.llama3-70b-instruct-v1:0",
+        # "anthropic.claude-3-5-sonnet-20240620-v1:0"
+        "gpt-4o"
     ]
 
     case_study_dir = "data/casestudy"
@@ -84,7 +85,7 @@ def main():
                 agent = Agent(
                     name="Base Agent",
                     role="Provide accurate, evidence-based recommendations. Always prioritize patient safety.",
-                    conversation=case_study,
+                    input=case_study,
                     model_id=model_id
                 )
                 response = agent.run()
