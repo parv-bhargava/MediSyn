@@ -11,6 +11,10 @@ from pydantic import BaseModel
 from rouge_score import rouge_scorer
 
 class DAFModel(BaseModel):
+    """
+    Diagnostic Accuracy Framework Model:
+    Link:https://pmc.ncbi.nlm.nih.gov/articles/PMC10984060/#:~:text=The%20human%20evaluation%20was%20split,be%20made%20through%20physical%20examination
+    """
     reasoning: str
     overall_accuracy: float
     plausibility  : float
