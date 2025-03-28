@@ -4,6 +4,7 @@ import time
 import json
 import boto3
 import torch
+from pydantic import BaseModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from botocore.exceptions import ClientError
 
@@ -12,18 +13,18 @@ from openai import OpenAI
 load_dotenv()
 
 class Agent:
-    def __init__(self, name, role, conversation="Conversation", model_id=None):
+    def __init__(self, name, role, input="Conversation", model_id=None):
         """
         Superclass representing a generic agent.
 
         :param name: The identifier of the agent.
         :param role: The system prompt or primary instruction.
-        :param conversation: Additional conversation or user prompt.
+        :param input: Additional input or user prompt.
         :param model_id: The model identifier to determine which runner to use.
         """
         self.name = name
         self.role = role
-        self.conversation = conversation
+        self.input = input
         self.model_id = model_id
 
     def run(self):
@@ -40,13 +41,18 @@ class Agent:
         else:
             raise ValueError("Unsupported model ID.")
 
+    def structure_run(self,structure):
+        if self.model_id in ["gpt-4o"]:
+            return RunnerGPT(self).structure_run(structure)
+        else:
+            raise ValueError("Unsupported model ID.")
 
 class RunnerGPT:
     def __init__(self, agent: Agent, model_id="gpt-4o"):
         """
         Initialize a RunnerGPT instance with an Agent instance.
 
-        :param agent: An instance of Agent containing role, conversation, and model_id.
+        :param agent: An instance of Agent containing role, input, and model_id.
         :param model_id: The model identifier, default is 'gpt-4o'.
         """
         self.agent = agent
@@ -61,17 +67,25 @@ class RunnerGPT:
         response = self.client.responses.create(
             model=self.model_id,
             instructions=self.agent.role,
-            input=self.agent.conversation,
+            input=self.agent.input,
         )
         return response.output_text if response else "No response."
 
+    def structure_run(self,structure):
+        response = self.client.responses.parse(
+            model="gpt-4o",
+            input= self.agent.input,
+            instructions=self.agent.role,
+            text_format= structure,
+        )
+        return  response.output[0].content[0].parsed
 
 class RunnerBedrock:
     def __init__(self, agent: Agent, region_name="us-east-1"):
         """
         Initialize a RunnerBedrock instance with an Agent instance and AWS Bedrock settings.
 
-        :param agent: An instance of Agent containing role, conversation, and model_id.
+        :param agent: An instance of Agent containing role, input, and model_id.
         :param region_name: AWS region name.
         """
         self.agent = agent
@@ -120,9 +134,9 @@ class RunnerBedrock:
     def run(self):
         """
         Execute the agent's task using AWS Bedrock.
-        Combines agent's role and conversation before sending the request.
+        Combines agent's role and input before sending the request.
         """
-        combined_prompt = f"{self.agent.role}\n{self.agent.conversation}"
+        combined_prompt = f"{self.agent.role}\n{self.agent.input}"
         if not self.client:
             raise ValueError("AWS client not initialized.")
         if not self.agent.model_id:
@@ -139,7 +153,7 @@ class RunnerBedrock:
                         "content": [
                             {
                                 "type": "text",
-                                "text": self.agent.conversation
+                                "text": self.agent.input
                             }
                         ]
                     }
@@ -192,7 +206,7 @@ class RunnerHF:
         """
         Initialize a RunnerHF instance with an Agent instance.
 
-        :param agent: An instance of Agent containing role, conversation, and model_id.
+        :param agent: An instance of Agent containing role, input, and model_id.
         """
         self.agent = agent
 
@@ -202,7 +216,7 @@ class RunnerHF:
         This method inlines the LLM functionality to load the model, tokenize the prompt,
         and generate a response.
         """
-        prompt = f"{self.agent.role}\n{self.agent.conversation}"
+        prompt = f"{self.agent.role}\n{self.agent.input}"
         model_name = self.agent.model_id.replace("hf:", "")
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -228,16 +242,15 @@ if __name__ == "__main__":
         agent_claude = Agent(
             name="AgentClaude",
             role="You are a medical document processor.",
-            conversation="Extract the key details from the provided document.",
+            input="Extract the key details from the provided document.",
             model_id="anthropic.claude-3-5-sonnet-20240620-v1:0"
         )
         print("AgentClaude response (Claude):", agent_claude.run())
 
-        # Example with a GPT model:
         agent_gpt = Agent(
             name="AgentGPT",
             role="You are a creative storyteller.",
-            conversation="Generate a short story about space exploration.",
+            input="Generate a short story about space exploration.",
             model_id="gpt-4o"
         )
         print("AgentGPT response:", agent_gpt.run())
@@ -246,7 +259,7 @@ if __name__ == "__main__":
         agent_llama = Agent(
             name="AgentLLama",
             role="You are a medical document processor.",
-            conversation="Extract the key details from the provided document.",
+            input="Extract the key details from the provided document.",
             model_id="meta.llama3-70b-instruct-v1:0"
         )
         print("AgentLLama response (LLama):", agent_llama.run())
