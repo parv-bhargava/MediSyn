@@ -66,7 +66,7 @@ def save_output(case_study_path: str, generated_text: str, tag: str = ""):
     return output_path
 
 
-def main():
+def main(eval=False):
     model_ids = [
         # "meta.llama3-70b-instruct-v1:0",
         # "anthropic.claude-3-5-sonnet-20240620-v1:0"
@@ -102,16 +102,16 @@ def main():
                     print(f"Agent ID: {agent_name}\nResponse:\n{response}\n")
                     if agent_name == "SYNTHESIS_AGENT":
                         save_output(case_study_path, response, tag=f"{model_id}-synthesis")
+    if eval:
+        evaluator = TreatmentEvaluator()
+        df_metrics = evaluator.evaluate(
+            output_dir="data/outputs",
+            reference_dir="data/casestudy"
+        )
 
-    evaluator = TreatmentEvaluator()
-    df_metrics = evaluator.evaluate(
-        output_dir="data/outputs",
-        reference_dir="data/casestudy"
-    )
-
-    df_metrics.to_excel("evaluation_results.xlsx", index=False)
-    print("\nEvaluation Results DataFrame:")
-    print(df_metrics)
+        df_metrics.to_excel("evaluation_results.xlsx", index=False)
+        print("\nEvaluation Results DataFrame:")
+        print(df_metrics)
 
 
 if __name__ == "__main__":

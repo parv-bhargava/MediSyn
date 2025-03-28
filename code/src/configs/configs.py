@@ -9,11 +9,18 @@ Here’s what you should do:
 Always aim for clarity, completeness, and alignment with the original task objective. Avoid redundancy or vague language.
 """
 JUDGE_PROMPT = """
-Evaluate the quality, relevance, and coherence of the generated text. Provide constructive feedback and suggestions for improvement. GIVE OUTPUT IN JSON FORMAT STRICTLY EXPLAINING YOUR JUDGEMENT. AND SCORE THE OUTPUT OUT OF 10 AND FLOAT.
+Evaluate On the Basis of the Following Criteria:
+The diagnostic accuracy framework was categorized into the following components: 
+(1) Overall Accuracy, 
+(2) Plausibility, 
+(3) Specificity, and 
+(4) Omission/ Uncertainty. 
 
-Example JSON format:
-{'judgement': 'The generated text is relevant and coherent, but lacks detailed explanations.Consider providing more in-depth insights and examples.','score': 8.5}
+Accuracy, Plausibility, and Specificity were applied at the individual diagnosis level and were conditioned such that only diagnoses classified as accurate were scored for plausibility and only those classified as plausible were scored for specificity. Accuracy represented how well it met the definition of a diagnosis as stated above. Plausibility represented if the diagnosis was hallucinated and could pose potential harm. Finally, Specificity captured the level of detail in the diagnosis (i.e., sepsis vs sepsis from influenza pneumonia). The final component of diagnostic evaluation, Omission/ Uncertainty, was applied to the entire list of outputted diagnoses. Omission captured instances in which a diagnosis was missing from the output, but would be considered in a clinical setting. Uncertainty, which is conditional on Omission, further penalized a model for not utilizing the information it was provided versus not being provided with enough information.
+
 """
+
+
 
 
 

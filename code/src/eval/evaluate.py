@@ -7,7 +7,15 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from agents.base_agent import Agent
 import ast
 from configs.configs import JUDGE_PROMPT
+from pydantic import BaseModel
 from rouge_score import rouge_scorer
+
+class DAFModel(BaseModel):
+    reasoning: str
+    overall_accuracy: float
+    plausibility  : float
+    specificity  : float
+    omission : float
 
 
 class TreatmentEvaluator:
@@ -39,24 +47,8 @@ class TreatmentEvaluator:
     def llm_as_judge(self, generated, reference, model_id):
         """Calculate LLM as judgement"""
         combined = f"{reference} {generated}"
-        return Agent(name="JUDGE", role=JUDGE_PROMPT, conversation=combined,
-                     model_id=model_id).run()
-
-    def get_llm_as_judge_score(self, generated, reference, model_id, max_retries=3):
-        retry_count = 0
-        llm_as_judge_score = None
-        while retry_count < max_retries:
-            try:
-                llm_as_judge = ast.literal_eval(self.llm_as_judge(generated, reference, model_id))
-                llm_as_judge_score = llm_as_judge.get('score')
-                assert isinstance(llm_as_judge_score, float), f"Expected float, got {type(llm_as_judge_score)}"
-                return llm_as_judge_score
-            except (ValueError, SyntaxError, AssertionError) as e:
-                retry_count += 1
-                print(f"Attempt {retry_count} failed: {e}")
-                if retry_count == max_retries:
-                    print("Max retries reached. Skipping and setting score to None.")
-                    return None
+        return Agent(name="JUDGE", role=JUDGE_PROMPT, input=combined,
+                     model_id=model_id).structure_run(DAFModel)
 
     def evaluate(self, output_dir="outputs", reference_dir="."):
         """
@@ -84,8 +76,9 @@ class TreatmentEvaluator:
                 generated, reference = self.load_data(output_path, ref_path)
                 bleu = self.calculate_bleu(generated, reference)
                 rouge = self.calculate_rouge(generated, reference)
-                llm_as_judge = self.get_llm_as_judge_score(generated, reference, model_id)
-                print(llm_as_judge)
+                #According to diagnostic accuracy framework https://pmc.ncbi.nlm.nih.gov/articles/PMC10984060/#:~:text=The%20human%20evaluation%20was%20split,be%20made%20through%20physical%20examination
+                daf = self.llm_as_judge(generated, reference, model_id)
+
                 results.append({
                     "output_file": fname,
                     "case_study": reference_name,
@@ -93,8 +86,12 @@ class TreatmentEvaluator:
                     "rouge1": rouge['rouge1'].fmeasure,
                     "rouge2": rouge['rouge2'].fmeasure,
                     "rougeL": rouge['rougeL'].fmeasure,
-                    "llm_as_judge": llm_as_judge
+                    "overall_accuracy": daf.overall_accuracy,
+                    "plausibility": daf.plausibility,
+                    "specificity": daf.specificity,
+                    "omission": daf.omission
                 })
+                print(results)
 
         df = pd.DataFrame(results)
         return df
