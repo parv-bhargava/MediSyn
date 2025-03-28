@@ -10,8 +10,6 @@ from botocore.exceptions import ClientError
 from openai import OpenAI
 
 load_dotenv()
-openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
 
 class Agent:
     def __init__(self, name, role, conversation="Conversation", model_id=None):
@@ -44,27 +42,28 @@ class Agent:
 
 
 class RunnerGPT:
-    def __init__(self, agent: Agent):
+    def __init__(self, agent: Agent, model_id="gpt-4o"):
         """
         Initialize a RunnerGPT instance with an Agent instance.
 
         :param agent: An instance of Agent containing role, conversation, and model_id.
+        :param model_id: The model identifier, default is 'gpt-4o'.
         """
         self.agent = agent
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.model_id = model_id
+
 
     def run(self):
         """
         Execute the agent's task using OpenAI's GPT API.
         """
-        response = openai_client.chat.completions.create(
-            model=self.agent.model_id,
-            messages=[
-                {"role": "system", "content": self.agent.role},
-                {"role": "user", "content": self.agent.conversation},
-            ]
-        ).choices[0].message.content
-
-        return response if response else "No response."
+        response = self.client.responses.create(
+            model=self.model_id,
+            instructions=self.agent.role,
+            input=self.agent.conversation,
+        )
+        return response.output_text if response else "No response."
 
 
 class RunnerBedrock:
