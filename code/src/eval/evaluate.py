@@ -80,7 +80,6 @@ class TreatmentEvaluator:
                 generated, reference = self.load_data(output_path, ref_path)
                 bleu = self.calculate_bleu(generated, reference)
                 rouge = self.calculate_rouge(generated, reference)
-                #According to diagnostic accuracy framework https://pmc.ncbi.nlm.nih.gov/articles/PMC10984060/#:~:text=The%20human%20evaluation%20was%20split,be%20made%20through%20physical%20examination
                 daf = self.llm_as_judge(generated, reference, model_id)
 
                 results.append({
