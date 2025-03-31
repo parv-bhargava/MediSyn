@@ -7,6 +7,7 @@ from eval.evaluate import TreatmentEvaluator
 from agents.base_agent import Agent
 from configs.configs import BASE_PROMPT, TUNED_PROMPT
 
+
 def generate_prompt(case_study_path):
     """
     Reads a case study JSON and returns the formatted prompt plus team member list.
@@ -66,14 +67,12 @@ def save_output(case_study_path: str, generated_text: str, tag: str = ""):
     return output_path
 
 
-def main(eval=False):
+def main(eval=False, case_study_dir="data/casestudy", output_dir="data/outputs"):
     model_ids = [
         # "meta.llama3-70b-instruct-v1:0",
         # "anthropic.claude-3-5-sonnet-20240620-v1:0"
         "gpt-4o"
     ]
-    case_study_dir = "data/casestudy"
-
     for fname in os.listdir(case_study_dir):
         if fname.endswith(".json"):
             case_study_path = os.path.join(case_study_dir, fname)
@@ -95,7 +94,7 @@ def main(eval=False):
             for model_id in model_ids:
                 agent = Agent(
                     name="Tuned Agent",
-                    role=TUNED_PROMPT,
+                    role=TUNED_PROMPT.format(team_list),
                     input=case_study,
                     model_id=model_id
                 )
@@ -116,8 +115,8 @@ def main(eval=False):
     if eval:
         evaluator = TreatmentEvaluator()
         df_metrics = evaluator.evaluate(
-            output_dir="data/outputs",
-            reference_dir="data/casestudy"
+            output_dir=output_dir,
+            reference_dir=case_study_dir
         )
 
         df_metrics.to_excel("evaluation_results.xlsx", index=False)
@@ -126,4 +125,11 @@ def main(eval=False):
 
 
 if __name__ == "__main__":
+    # Base main
     main()
+    # Claude main
+    main(eval=True, case_study_dir="data/casestudy_claude", output_dir="data/outputs_claude")
+    # Llama main
+    main(eval=True, case_study_dir="data/casestudy_llama", output_dir="data/outputs_llama")
+    # gpt-4o main
+    main(eval=True, case_study_dir="data/casestudy_gpt4o", output_dir="data/outputs_gpt4o")
