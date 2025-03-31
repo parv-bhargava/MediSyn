@@ -136,7 +136,6 @@ class RunnerBedrock:
         Execute the agent's task using AWS Bedrock.
         Combines agent's role and input before sending the request.
         """
-        combined_prompt = f"{self.agent.role}\n{self.agent.input}"
         if not self.client:
             raise ValueError("AWS client not initialized.")
         if not self.agent.model_id:
@@ -177,6 +176,12 @@ class RunnerBedrock:
                 return None
 
         elif "llama" in self.agent.model_id.lower():
+            combined_prompt = f"""<|begin_of_text|>
+                        <|start_header_id|>system<|end_header_id|>
+                        {self.agent.role}<|eot_id|>
+                        <|start_header_id|>user<|end_header_id|>
+                        {self.agent.input}<|eot_id|>
+                        <|start_header_id|>assistant<|end_header_id|>"""
             body_content = {
                 "prompt": combined_prompt,
                 "temperature": self.temperature,
