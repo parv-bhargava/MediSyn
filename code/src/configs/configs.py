@@ -28,6 +28,7 @@ Create a comprehensive treatment plan with specific recommendations from each te
 
 Structure your response using EXACTLY these section headers:
 {}
+{{For each team member}}
 [Full Team Member Role Name]: [Recommendations]
 """
 
