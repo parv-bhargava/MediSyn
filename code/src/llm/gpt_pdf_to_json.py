@@ -11,10 +11,30 @@ from unstructured.documents.elements import Element
 from code.src.agents.base_agent import Agent
 from pydantic import BaseModel
 from typing import List
+
 # Load environment variables
 load_dotenv()
-PDF_PROCESSOR ="""You are a medical document processor. Extract all relevant information from the provided PDF content without summarizing, DO not add extra information, Give me Exact Text in pdf in the given format.
+PDF_PROCESSOR = """
+You are a medical document processor. Extract ALL information into this EXACT format:
+     "name": "string", 
+     "age": "string",
+     "diagnosis": ["string"]
+     "summary": "Concise clinical summary",
+     "team_members": ["string"],
+     "background": "Medical history and key events",
+     "assessment_plan": "The assessment plan section including the individual team member assessments",
+     "assessment_results": "The assessment results section including the individual team member assessments results",
+     "treatment_plan": "The Treatment plan section including the individual team member's take on the treatment plan"
+
+    RULES:
+    1. Output ONLY Exact Format given 
+    2. Use exact field names
+    3. Never add comments
+    4. Maintain original medical terms
+    5. Be explanatory and don't summarize the information
 """
+
+
 class MedicalDocument(BaseModel):
     name: str
     age: str
@@ -43,9 +63,6 @@ class MedicalDocument(BaseModel):
 
 
 class PDFProcessor:
-    def __init__(self):
-        self.llm = Agent()
-
     def extract_pdf_text(self, pdf_path):
         """Extract structured text using Unstructured library"""
         elements = partition_pdf(
@@ -56,37 +73,18 @@ class PDFProcessor:
         )
         return "\n\n".join([str(el) for el in elements])
 
-    def generate_prompt(self, text_content):
-        """Llama 3 optimized prompt formatting"""
-        return f"""
-    You are a medical document processor.don't summarize the information
-    RULES:
-    2. Use exact field names
-    3. Never add comments
-    4. Maintain original medical terms
-    5. Be explanatory and 
-    PDF CONTENT:
-    {text_content}
-    """
-
     def process_pdf(self, pdf_path):
         """Robust processing with detailed logging"""
         raw_output = ""
         try:
             print(f"\nProcessing {pdf_path}...")
-
             # Step 1: Extract text
             raw_text = self.extract_pdf_text(pdf_path)
             if not raw_text:
                 raise ValueError("Empty PDF text extraction")
             print(f"Extracted {len(raw_text)} characters")
-
             # Step 2: Generate prompt
-            prompt = self.generate_prompt(raw_text)
-            print("Prompt generated successfully")
-
-            # Step 3: Call Bedrock
-            response = Agent(name="PDF FORMAT", role=PDF_PROCESSOR, input=raw_text,
+            response = Agent(name="PDF FORMAT", role=PDF_PROCESSOR, input=f"PDF CONTENT:\n{raw_text}",
                              model_id="gpt-40").structure_run(MedicalDocument)
 
             return response.to_nested_json()
