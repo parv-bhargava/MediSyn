@@ -5,7 +5,7 @@ import re
 from agents.dynamic_agent import DynamicAgentManager
 from eval.evaluate import TreatmentEvaluator
 from agents.base_agent import Agent
-
+from configs.configs import BASE_PROMPT, TUNED_PROMPT
 
 def generate_prompt(case_study_path):
     """
@@ -72,7 +72,6 @@ def main(eval=False):
         # "anthropic.claude-3-5-sonnet-20240620-v1:0"
         "gpt-4o"
     ]
-
     case_study_dir = "data/casestudy"
 
     for fname in os.listdir(case_study_dir):
@@ -84,13 +83,25 @@ def main(eval=False):
             for model_id in model_ids:
                 agent = Agent(
                     name="Base Agent",
-                    role="Provide accurate, evidence-based recommendations. Always prioritize patient safety.",
+                    role=BASE_PROMPT,
                     input=case_study,
                     model_id=model_id
                 )
                 response = agent.run()
                 print(f"Base Agent Response for model {model_id} on {fname}:\n{response}\n")
                 save_output(case_study_path, response, tag=f"{model_id}-base")
+
+            # --- Tuned Agent responses ---
+            for model_id in model_ids:
+                agent = Agent(
+                    name="Tuned Agent",
+                    role=TUNED_PROMPT,
+                    input=case_study,
+                    model_id=model_id
+                )
+                response = agent.run()
+                print(f"Tuned Agent Response for model {model_id} on {fname}:\n{response}\n")
+                save_output(case_study_path, response, tag=f"{model_id}-tuned")
 
             # --- Multi-Agent (Synthesis) responses ---
             for model_id in model_ids:

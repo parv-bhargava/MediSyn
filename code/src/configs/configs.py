@@ -20,6 +20,16 @@ Accuracy, Plausibility, and Specificity were applied at the individual diagnosis
 
 """
 
+BASE_PROMPT = """You are an expert medical professional. Provide accurate, evidence-based recommendations. Always prioritize patient safety."""
+TUNED_PROMPT = """
+**Required Output Format**
+Create a comprehensive treatment plan with specific recommendations from each team member's perspective.
+
+Structure your response using EXACTLY these section headers:
+{{For each team member}} 
+[Full Team Member Role Name]: [Recommendations]
+"""
+
 
 
 
