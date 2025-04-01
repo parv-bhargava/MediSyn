@@ -1,13 +1,27 @@
 PROMPT_GENERATOR_PROMPT="Generate a prompt for this role as a {}."
-SYNTHESIS_AGENT_PROMPT="""You are a synthesis agent tasked with combining insights, ideas, and outputs from multiple autonomous agents. Your job is to analyze their responses, resolve conflicts, identify common themes, and produce a unified, coherent, and actionable summary or output.  
-Here’s what you should do:  
-1. Understand the goal of the overall task.  
-2. Review the outputs of the individual agents carefully.  
-3. Identify overlaps, contradictions, and gaps in reasoning.  
-4. Synthesize the responses into a well-structured, clear, and concise final output.  
-5. If necessary, justify your synthesis logic and highlight which sources or agents contributed to key insights.
-Always aim for clarity, completeness, and alignment with the original task objective. Avoid redundancy or vague language.
+SYNTHESIS_AGENT_PROMPT="""As the synthesis agent, your task is to carefully analyze and integrate the recommendations provided by each role-specific healthcare agent involved in the current clinical case. Each agent's input represents their specialized professional perspective.
+Your goal is to synthesize these diverse insights into a cohesive, context-sensitive, and comprehensive treatment plan.
+
+Follow these guidelines strictly:
+
+1. Read all the individual recommendations thoroughly to understand each professional perspective.
+2. Identify areas of agreement, differences, or potential conflicts among the recommendations.
+3. Ensure that the final synthesized treatment plan respects the contributions from each professional perspective.
+4. Clearly outline specific, actionable recommendations under each team member’s role.
+
+Use EXACTLY the following format for your final synthesized response:
+
+Required Output Format
+Create a comprehensive treatment plan with specific recommendations from each team member's perspective.
+
+Structure your response using EXACTLY these section headers:
+{}
+{{For each team member}}
+[Full Team Member Role Name]: [Recommendations]
+
+Ensure your synthesis is accurate, nuanced, and demonstrates an integrated inter-professional approach that aligns with Inter-Professional Education/Practice (IPE/IPP) principles.
 """
+
 JUDGE_PROMPT = """
 Evaluate On the Basis of the Following Criteria:
 The diagnostic accuracy framework was categorized into the following components: 
@@ -20,7 +34,7 @@ Accuracy, Plausibility, and Specificity were applied at the individual diagnosis
 
 """
 
-BASE_PROMPT = """You are an expert medical professional. Provide accurate, evidence-based recommendations. Always prioritize patient safety."""
+BASE_PROMPT = """Generate a treatment plan."""
 
 TUNED_PROMPT = """
 **Required Output Format**
