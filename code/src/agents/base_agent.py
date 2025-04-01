@@ -279,11 +279,5 @@ if __name__ == "__main__":
             model_id="hf:meta-llama/Llama-3.3-70B-Instruct"
         )
 
-        agent_hf_claude = Agent(
-            name="AgentHFClaude",
-            role="You are a medical document processor.",
-            input="Extract the key details from the provided document.",
-            model_id="hf:TreeNumber/claude-3.5-sonnet"
-        )
     except ValueError as e:
         print("Initialization error:", e)
