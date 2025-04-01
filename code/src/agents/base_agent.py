@@ -220,6 +220,8 @@ class RunnerHF:
         Execute the agent's task using a Hugging Face model.
         This method inlines the LLM functionality to load the model, tokenize the prompt,
         and generate a response.
+
+        Note: To login use `huggingface-cli login` command in the terminal and enter your token.
         """
         prompt = f"{self.agent.role}\n{self.agent.input}"
         model_name = self.agent.model_id.replace("hf:", "")
@@ -268,5 +270,13 @@ if __name__ == "__main__":
             model_id="meta.llama3-70b-instruct-v1:0"
         )
         print("AgentLLama response (LLama):", agent_llama.run())
+
+        # Example with a Hugging Face model:
+        agent_hf = Agent(
+            name="AgentHF",
+            role="You are a medical document processor.",
+            input="Extract the key details from the provided document.",
+            model_id="hf:meta-llama/Llama-2-7b-chat-hf"
+        )
     except ValueError as e:
         print("Initialization error:", e)
