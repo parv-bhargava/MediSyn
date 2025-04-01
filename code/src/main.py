@@ -71,8 +71,10 @@ def main(eval=False, case_study_dir="data/Case_Study_Json_Manual", output_dir="d
     model_ids = [
         # "meta.llama3-70b-instruct-v1:0",
         # "anthropic.claude-3-5-sonnet-20240620-v1:0"
-        "gpt-4o"
+        # "gpt-4o"
+        "hf:meta-llama/Llama-3.3-70B-Instruct"
     ]
+
     print(output_dir)
     for fname in os.listdir(case_study_dir):
         if fname.endswith(".json"):
@@ -131,10 +133,12 @@ if __name__ == "__main__":
     # Base main
     # main(eval=True, output_dir="data/outputs_manual_llama")
     # main(eval=True, output_dir="data/outputs_manual_claude")
-    main(eval=True, output_dir="data/outputs_manual_gpt4o")
+    # main(eval=True, output_dir="data/outputs_manual_gpt4o")
+    main(eval=True, output_dir="data/outputs_manual_hf_llama")
     # Claude main
     # main(eval=True, case_study_dir="data/Claude_case_study_json", output_dir="data/outputs_claude")
     # Llama main
     # main(eval=True, case_study_dir="data/Llama_case_study_json", output_dir="data/outputs_llama")
     # gpt-4o main
     # main(eval=True, case_study_dir="data/gpt_case_study_json", output_dir="data/outputs_gpt4o")
+    # main(eval=True, case_study_dir="data/Llama_case_study_json", output_dir="data/outputs_manual_hf_llama")
