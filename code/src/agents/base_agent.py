@@ -272,11 +272,18 @@ if __name__ == "__main__":
         print("AgentLLama response (LLama):", agent_llama.run())
 
         # Example with a Hugging Face model:
-        agent_hf = Agent(
-            name="AgentHF",
+        agent_hf_llama = Agent(
+            name="AgentHFLLama",
             role="You are a medical document processor.",
             input="Extract the key details from the provided document.",
-            model_id="hf:meta-llama/Llama-2-7b-chat-hf"
+            model_id="hf:meta-llama/Llama-3.3-70B-Instruct"
+        )
+
+        agent_hf_claude = Agent(
+            name="AgentHFClaude",
+            role="You are a medical document processor.",
+            input="Extract the key details from the provided document.",
+            model_id="hf:TreeNumber/claude-3.5-sonnet"
         )
     except ValueError as e:
         print("Initialization error:", e)
