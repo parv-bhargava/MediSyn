@@ -37,12 +37,12 @@ Diagnoses: {', '.join(case_data['patient_info']['diagnosis'])}
     return prompt, case_data['team_members']
 
 
-def save_output(case_study_path: str, generated_text: str, tag: str = ""):
+def save_output(case_study_path: str, generated_text: str, tag: str = "", output_dir="data/outputs"):
     """
     Save generated output to a JSON file with a case-specific and tag-specific filename.
     Sanitizes file names to remove illegal characters like colons (:) and slashes.
     """
-    output_dir = "data/outputs"
+
     os.makedirs(output_dir, exist_ok=True)
 
     base_name = os.path.splitext(os.path.basename(case_study_path))[0]
@@ -62,17 +62,18 @@ def save_output(case_study_path: str, generated_text: str, tag: str = ""):
     }
 
     with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(output_data, f, indent=2)
+        json.dump(output_data, f, indent=2, ensure_ascii=False)
 
     return output_path
 
 
-def main(eval=False, case_study_dir="data/casestudy", output_dir="data/outputs"):
+def main(eval=False, case_study_dir="data/Case_Study_Json_Manual", output_dir="data/outputs"):
     model_ids = [
-        # "meta.llama3-70b-instruct-v1:0",
+        "meta.llama3-70b-instruct-v1:0",
         # "anthropic.claude-3-5-sonnet-20240620-v1:0"
-        "gpt-4o"
+        # "gpt-4o"
     ]
+    print(output_dir)
     for fname in os.listdir(case_study_dir):
         if fname.endswith(".json"):
             case_study_path = os.path.join(case_study_dir, fname)
@@ -88,7 +89,7 @@ def main(eval=False, case_study_dir="data/casestudy", output_dir="data/outputs")
                 )
                 response = agent.run()
                 print(f"Base Agent Response for model {model_id} on {fname}:\n{response}\n")
-                save_output(case_study_path, response, tag=f"{model_id}-base")
+                save_output(case_study_path, response, tag=f"{model_id}-base", output_dir=output_dir)
 
             # --- Tuned Agent responses ---
             for model_id in model_ids:
@@ -100,7 +101,7 @@ def main(eval=False, case_study_dir="data/casestudy", output_dir="data/outputs")
                 )
                 response = agent.run()
                 print(f"Tuned Agent Response for model {model_id} on {fname}:\n{response}\n")
-                save_output(case_study_path, response, tag=f"{model_id}-tuned")
+                save_output(case_study_path, response, tag=f"{model_id}-tuned", output_dir=output_dir)
 
             # --- Multi-Agent (Synthesis) responses ---
             for model_id in model_ids:
@@ -111,7 +112,7 @@ def main(eval=False, case_study_dir="data/casestudy", output_dir="data/outputs")
                 for agent_name, response in mas.memory.items():
                     print(f"Agent ID: {agent_name}\nResponse:\n{response}\n")
                     if agent_name == "SYNTHESIS_AGENT":
-                        save_output(case_study_path, response, tag=f"{model_id}-synthesis")
+                        save_output(case_study_path, response, tag=f"{model_id}-synthesis", output_dir=output_dir)
     if eval:
         evaluator = TreatmentEvaluator()
         df_metrics = evaluator.evaluate(
@@ -119,17 +120,19 @@ def main(eval=False, case_study_dir="data/casestudy", output_dir="data/outputs")
             reference_dir=case_study_dir
         )
 
-        df_metrics.to_excel("evaluation_results.xlsx", index=False)
+        eval_filename = f"evaluation_results_{model_ids}.xlsx"
+        eval_filepath = os.path.join(output_dir, eval_filename)
+        df_metrics.to_excel(eval_filepath, index=False)
         print("\nEvaluation Results DataFrame:")
         print(df_metrics)
 
 
 if __name__ == "__main__":
     # Base main
-    main()
+    main(eval=True, output_dir="data/outputs_manual_llama")
     # Claude main
-    main(eval=True, case_study_dir="data/casestudy_claude", output_dir="data/outputs_claude")
+    # main(eval=True, case_study_dir="data/casestudy_claude", output_dir="data/outputs_claude")
     # Llama main
-    main(eval=True, case_study_dir="data/casestudy_llama", output_dir="data/outputs_llama")
+    # main(eval=True, case_study_dir="data/casestudy_llama", output_dir="data/outputs_llama")
     # gpt-4o main
-    main(eval=True, case_study_dir="data/casestudy_gpt4o", output_dir="data/outputs_gpt4o")
+    # main(eval=True, case_study_dir="data/casestudy_gpt4o", output_dir="data/outputs_gpt4o")
