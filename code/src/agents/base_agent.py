@@ -7,10 +7,12 @@ import torch
 from pydantic import BaseModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from botocore.exceptions import ClientError
+from accelerate import Accelerator
 
 from openai import OpenAI
 
 load_dotenv()
+
 
 class Agent:
     def __init__(self, name, role, input="Conversation", model_id=None):
@@ -33,19 +35,48 @@ class Agent:
         Passes the agent object to the corresponding runner.
         """
         if self.model_id in ["gpt-4o", "gpt-4o-turbo"]:
-            return RunnerGPT(self).run()
+            return RunnerGPT(self).embed_run()
         elif self.model_id in ["meta.llama3-70b-instruct-v1:0", "anthropic.claude-3-5-sonnet-20240620-v1:0"]:
             return RunnerBedrock(self).run()
+        elif self.model_id.startswith("hf:"):
+            return RunnerHF(self).accelarate_run()
+        else:
+            raise ValueError("Unsupported model ID.")
+
+    def structure_run(self, structure):
+        if self.model_id in ["gpt-4o"]:
+            return RunnerGPT(self).structure_run(structure)
+        else:
+            raise ValueError("Unsupported model ID.")
+
+
+class AgentEmbedding:
+    def __init__(self, name, input, model_id=None):
+        """
+        Superclass representing a generic agent.
+
+        :param name: The identifier of the agent.
+        :param input: Additional input or user prompt.
+        :param model_id: The model identifier to determine which runner to use.
+        """
+        self.name = name
+        self.input = input
+        self.model_id = model_id
+
+    def run(self):
+        """
+        Execute the agent's task by delegating to the appropriate runner.
+        Passes the agent object to the corresponding runner.
+        """
+        if self.model_id in ["text-embedding-3-small", "text-embedding-3-large"]:
+            return RunnerGPT(self).embed_run()
+        elif self.model_id in ["amazon.titan-embed-text-v2:0"]:
+            return RunnerBedrock(self).embed_run()
         elif self.model_id.startswith("hf:"):
             return RunnerHF(self).run()
         else:
             raise ValueError("Unsupported model ID.")
 
-    def structure_run(self,structure):
-        if self.model_id in ["gpt-4o"]:
-            return RunnerGPT(self).structure_run(structure)
-        else:
-            raise ValueError("Unsupported model ID.")
 
 class RunnerGPT:
     def __init__(self, agent: Agent, model_id="gpt-4o"):
@@ -59,6 +90,15 @@ class RunnerGPT:
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model_id = model_id
 
+    def embed_run(self):
+        """
+        Execute the agent's task using OpenAI's GPT API for embedding.
+        """
+        response = self.client.embeddings.create(
+            model=self.model_id,
+            input=self.agent.input,
+        )
+        return response.data[0].embedding if response else "No response."
 
     def run(self):
         """
@@ -71,14 +111,15 @@ class RunnerGPT:
         )
         return response.output_text if response else "No response."
 
-    def structure_run(self,structure):
+    def structure_run(self, structure):
         response = self.client.responses.parse(
             model="gpt-4o",
-            input= self.agent.input,
+            input=self.agent.input,
             instructions=self.agent.role,
-            text_format= structure,
+            text_format=structure,
         )
-        return  response.output[0].content[0].parsed
+        return response.output[0].content[0].parsed
+
 
 class RunnerBedrock:
     def __init__(self, agent: Agent, region_name="us-east-1"):
@@ -130,6 +171,32 @@ class RunnerBedrock:
         Set the maximum tokens for response generation.
         """
         self.max_tokens = max_tokens
+
+    def embed_run(self):
+        """
+        Execute the agent's task using AWS Bedrock for embedding.
+        """
+        if not self.client:
+            raise ValueError("AWS client not initialized.")
+        if not self.agent.model_id:
+            raise ValueError("Model ID is not set.")
+
+        try:
+            response = self.client.invoke_model(
+                modelId=self.agent.model_id,
+                contentType="application/json",
+                accept="application/json",
+                body=json.dumps({"inputText": self.agent.input})
+            )
+            response_body = json.loads(response['body'].read().decode())
+            print(f"Response from Bedrock for agent {self.agent.name}: {response_body}")
+            return response_body['embedding']
+        except ClientError as e:
+            print(f"Error: {e.response['Error']['Message']}")
+            return None
+        except (KeyError, json.JSONDecodeError):
+            print("Unexpected response format or failed to decode response")
+            return None
 
     def run(self):
         """
@@ -242,6 +309,34 @@ class RunnerHF:
         response = tokenizer.decode(output[0], skip_special_tokens=True)
         return response
 
+    def accelarate_run(self):
+        """
+        Execute the agent's task using a Hugging Face model with accelerated inference.
+        This method inlines the LLM functionality to load the model, tokenize the prompt,
+        and generate a response.
+        """
+        accelerator = Accelerator()
+        prompt = f"{self.agent.role}\n{self.agent.input}"
+        model_name = self.agent.model_id.replace("hf:", "")
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"Loading model: {model_name} on {device}")
+
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map="auto",
+            offload_folder="offload",
+            offload_state_dict=True,
+        )
+
+        inputs = tokenizer(prompt, return_tensors="pt").to(device)
+        inputs = {key: value.to(accelerator.device) for key, value in inputs.items()}
+        with accelerator.unwrap_model(model).generate(**inputs, max_new_tokens=50) as outputs:
+            response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        return response
+
 
 if __name__ == "__main__":
     try:
@@ -278,6 +373,29 @@ if __name__ == "__main__":
             input="Extract the key details from the provided document.",
             model_id="hf:meta-llama/Llama-3.3-70B-Instruct"
         )
+        print("AgentHFLLama response (Hugging Face):", agent_hf_llama.run())
 
+        agent_hf_claude = Agent(
+            name="AgentHFClaude",
+            role="You are a medical document processor.",
+            input="Extract the key details from the provided document.",
+            model_id="hf:deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
+        )
+        print("AgentHFClaude response (Hugging Face):", agent_hf_claude.run())
+        # Example with embedding
+        agent_embedding = AgentEmbedding(
+            name="AgentEmbedding",
+            input="This is a test input for embedding.",
+            model_id="text-embedding-3-large"
+        )
+        print("AgentEmbedding response:", agent_embedding.run())
+
+        # Example with embedding using Bedrock
+        agent_embedding_bedrock = AgentEmbedding(
+            name="AgentEmbeddingBedrock",
+            input="This is a test input for embedding.",
+            model_id="amazon.titan-embed-text-v2:0"
+        )
+        print("AgentEmbeddingBedrock response:", agent_embedding_bedrock.run())
     except ValueError as e:
         print("Initialization error:", e)
