@@ -1,0 +1,54 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+import re
+print(os.getcwd())
+os.chdir('../data/')
+print(os.getcwd())
+
+# Read the Excel files
+manual_claude_df=pd.read_excel("outputs_manual_claude/evaluation_results_['anthropic.claude-3-5-sonnet-20240620-v1:0'].xlsx")
+manual_gpt_df = pd.read_excel("outputs_manual_gpt4o/evaluation_results_['gpt-4o'].xlsx")
+manual_llama_df = pd.read_excel("outputs_manual_llama/evaluation_results_['meta.llama3-70b-instruct-v1:0'].xlsx")
+
+metrics = [
+    'bleu', 'rouge1', 'rouge2', 'rougeL',
+    'overall_accuracy', 'plausibility', 'specificity', 'omission'
+]
+def extract_method(filename):
+    if 'base' in filename:
+        return 'base'
+    elif 'tuned' in filename:
+        return 'tuned'
+    elif 'synthesis' in filename:
+        return 'synthesis'
+    else:
+        return 'unknown'
+
+
+def bar_plots(summary, llm_name):
+    fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(20, 10))
+    axes = axes.flatten()
+
+    for i, metric in enumerate(metrics):
+        axes[i].bar(summary['method'], summary[metric])
+        axes[i].set_title(metric)
+        axes[i].set_ylabel("Average Score")
+        axes[i].set_xlabel("Method")
+    fig.suptitle(f'{llm_name} Evaluation (Data Prepared Manually)')
+    plt.tight_layout()
+    plt.show()
+
+
+manual_claude_df['method'] = manual_claude_df['output_file'].apply(extract_method)
+claude_summary = manual_claude_df.groupby('method')[metrics].mean().reset_index()
+
+manual_gpt_df['method'] = manual_gpt_df['output_file'].apply(extract_method)
+gpt_summary = manual_gpt_df.groupby('method')[metrics].mean().reset_index()
+
+manual_llama_df['method'] = manual_llama_df['output_file'].apply(extract_method)
+llama_summary = manual_llama_df.groupby('method')[metrics].mean().reset_index()
+
+bar_plots(claude_summary, llm_name="Claude")
+bar_plots(gpt_summary, llm_name="GPT-4o")
+bar_plots(llama_summary, llm_name="Llama")
