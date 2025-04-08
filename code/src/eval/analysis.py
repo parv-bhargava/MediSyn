@@ -52,9 +52,9 @@ gpt_summary = manual_gpt_df.groupby('method')[metrics].mean().reset_index()
 manual_llama_df['method'] = manual_llama_df['output_file'].apply(extract_method)
 llama_summary = manual_llama_df.groupby('method')[metrics].mean().reset_index()
 
-# bar_plots(claude_summary, llm_name="Claude", data='Data Prepared Manually')
-# bar_plots(gpt_summary, llm_name="GPT-4o", data='Data Prepared Manually')
-# bar_plots(llama_summary, llm_name="Llama", data='Data Prepared Manually')
+bar_plots(claude_summary, llm_name="Claude", data='Data Prepared Manually')
+bar_plots(gpt_summary, llm_name="GPT-4o", data='Data Prepared Manually')
+bar_plots(llama_summary, llm_name="Llama", data='Data Prepared Manually')
 
 # -------------------------------------- XXXX ---------------------------------------
 
@@ -114,18 +114,18 @@ line_data = pd.concat([
 line_df = line_data.melt(id_vars=['model', 'method'], var_name='metric', value_name='score')
 
 # Plot
-# plt.figure(figsize=(12, 6))
-# for model in line_df['model'].unique():
-#     subset = line_df[(line_df['model'] == model) & (line_df['metric'] == 'overall_accuracy')]
-#     plt.plot(subset['method'], subset['score'], label=model, marker='o')
-#
-# plt.title('Overall Accuracy Comparison Across Methods')
-# plt.xlabel('Method')
-# plt.ylabel('Average Overall Accuracy')
-# plt.legend(title='Model')
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
+plt.figure(figsize=(12, 6))
+for model in line_df['model'].unique():
+    subset = line_df[(line_df['model'] == model) & (line_df['metric'] == 'overall_accuracy')]
+    plt.plot(subset['method'], subset['score'], label=model, marker='o')
+
+plt.title('Overall Accuracy Comparison Across Methods')
+plt.xlabel('Method')
+plt.ylabel('Average Overall Accuracy')
+plt.legend(title='Model')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
 
 # -------------------------------------- XXXX ---------------------------------------
 
@@ -139,6 +139,54 @@ gpt_summary = gpt_df.groupby('method')[metrics].mean().reset_index()
 llama_df['method'] = llama_df['output_file'].apply(extract_method)
 llama_summary = llama_df.groupby('method')[metrics].mean().reset_index()
 
-# bar_plots(claude_summary, llm_name="Claude", data='Data Prepared by Claude')
-# bar_plots(gpt_summary, llm_name="GPT-4o", data='Data Prepared by GPT')
-# bar_plots(llama_summary, llm_name="Llama", data='Data Prepared Llama')
+bar_plots(claude_summary, llm_name="Claude", data='Data Prepared by Claude')
+bar_plots(gpt_summary, llm_name="GPT-4o", data='Data Prepared by GPT')
+bar_plots(llama_summary, llm_name="Llama", data='Data Prepared Llama')
+
+# -------------------------------------- XXXX ---------------------------------------
+
+gpt_df['model'] = 'gpt-4o'
+llama_df['model'] = 'llama3'
+claude_df['model'] = 'claude-3.5'
+
+# Combine all into a single DataFrame
+combined_df = pd.concat([gpt_df, llama_df, claude_df], ignore_index=True)
+
+base_df = combined_df[combined_df['method'] == 'base']
+tuned_df = combined_df[combined_df['method'] == 'tuned']
+synthesis_df = combined_df[combined_df['method'] == 'synthesis']
+
+synthesis_summary = synthesis_df.groupby('model')[metrics].mean().reset_index()
+base_summary = base_df.groupby('model')[metrics].mean().reset_index()
+tuned_summary = tuned_df.groupby('model')[metrics].mean().reset_index()
+
+final_table_dpl = reformat_summary_table(base_summary, tuned_summary, synthesis_summary)
+# final_table_dpl.to_csv('../eval/Final_eval_DPL.csv')
+
+# -------------------------------------- XXXX ---------------------------------------
+
+# Line chart showing metric trends across models per method for LLM prepared data
+
+# Average per metric per method per model for line chart
+line_data = pd.concat([
+    base_summary.assign(method='base'),
+    tuned_summary.assign(method='tuned'),
+    synthesis_summary.assign(method='synthesis')
+])
+
+# Melt the dataframe to long format for plotting
+line_df_llm = line_data.melt(id_vars=['model', 'method'], var_name='metric', value_name='score')
+
+# Plot
+plt.figure(figsize=(12, 6))
+for model in line_df_llm['model'].unique():
+    subset = line_df_llm[(line_df_llm['model'] == model) & (line_df_llm['metric'] == 'overall_accuracy')]
+    plt.plot(subset['method'], subset['score'], label=model, marker='o')
+
+plt.title('Overall Accuracy Comparison Across Methods')
+plt.xlabel('Method')
+plt.ylabel('Average Overall Accuracy')
+plt.legend(title='Model')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
