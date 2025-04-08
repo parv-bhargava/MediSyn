@@ -94,4 +94,32 @@ base_summary = base_df.groupby('model')[metrics].mean().reset_index()
 tuned_summary = tuned_df.groupby('model')[metrics].mean().reset_index()
 
 final_table = reformat_summary_table(base_summary, tuned_summary, synthesis_summary)
-final_table.to_csv('../eval/Final_eval_DMP.csv')
+# final_table.to_csv('../eval/Final_eval_DMP.csv')
+
+# -------------------------------------- XXXX ---------------------------------------
+
+# Line chart showing metric trends across models per method
+
+# Average per metric per method per model for line chart
+line_data = pd.concat([
+    base_summary.assign(method='base'),
+    tuned_summary.assign(method='tuned'),
+    synthesis_summary.assign(method='synthesis')
+])
+
+# Melt the dataframe to long format for plotting
+line_df = line_data.melt(id_vars=['model', 'method'], var_name='metric', value_name='score')
+
+# Plot
+plt.figure(figsize=(12, 6))
+for model in line_df['model'].unique():
+    subset = line_df[(line_df['model'] == model) & (line_df['metric'] == 'overall_accuracy')]
+    plt.plot(subset['method'], subset['score'], label=model, marker='o')
+
+plt.title('Overall Accuracy Comparison Across Methods')
+plt.xlabel('Method')
+plt.ylabel('Average Overall Accuracy')
+plt.legend(title='Model')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
