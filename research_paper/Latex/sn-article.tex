@@ -41,6 +41,7 @@
 %%%% Standard Packages
 %%<additional latex packages if required can be included here>
 
+\PassOptionsToPackage{table,xcdraw}{xcolor}
 \usepackage{graphicx}%
 \usepackage{multirow}%
 \usepackage{amsmath,amssymb,amsfonts}%
@@ -55,6 +56,56 @@
 \usepackage{algorithmicx}%
 \usepackage{algpseudocode}%
 \usepackage{listings}%
+\usepackage[most]{tcolorbox}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{float}
+
+\lstdefinelanguage{json}{
+    basicstyle=\ttfamily\footnotesize,
+    %%numbers=left,
+    %%numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    literate=
+     *{0}{{{\color{blue}0}}}{1}
+      {1}{{{\color{blue}1}}}{1}
+      {2}{{{\color{blue}2}}}{1}
+      {3}{{{\color{blue}3}}}{1}
+      {4}{{{\color{blue}4}}}{1}
+      {5}{{{\color{blue}5}}}{1}
+      {6}{{{\color{blue}6}}}{1}
+      {7}{{{\color{blue}7}}}{1}
+      {8}{{{\color{blue}8}}}{1}
+      {9}{{{\color{blue}9}}}{1}
+}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+%%  backgroundcolor=\color{blue!5}
+  %%frame=single,
+  numbers=none,
+}
+\tcbset{
+    mypromptbox/.style={
+        colback=blue!5,        % light blue background
+        colframe=blue!80!black, % blue border
+        boxrule=0.5pt,         % border thickness
+        arc=4pt,               % rounded corners
+        outer arc=4pt,
+        boxsep=5pt,            % padding inside box
+        left=5pt,
+        right=5pt,
+        top=5pt,
+        bottom=5pt,
+        breakable              % allow page breaks inside box
+    }
+}
+
 %%%%
 
 %%%%%=============================================================================%%%%
@@ -120,7 +171,7 @@
 %% Sample for unstructured abstract %%
 %%==================================%%
 
-\abstract{The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. Authors are advised to check the author instructions for the journal they are submitting to for word limits and if structural elements like subheadings, citations, or equations are permitted.}
+\abstract{The increasing complexity of modern healthcare necessitates collaborative, inter-professional approaches to ensure comprehensive patient care. While general-purpose large language models (LLMs) offer promising capabilities, they often lack the profession-specific reasoning needed for clinically grounded treatment planning. In this work, we explore the integration of Inter-Professional Education/Practice (IPE/IPP) principles into an AI-driven framework by developing MediSyn—a multi-agent system that dynamically creates role-specific agents based on real-world case studies. We compare this approach against baseline methods including single LLM and prompt-tuned LLM pipelines, each tasked with generating treatment plans from structured case data. Rather than asserting a singular best-performing solution, our aim is to evaluate how a specialized multi-agent design stacks up against more general-purpose strategies. The findings offer valuable insights into the trade-offs between domain-informed agent collaboration and general LLM-based approaches in medical AI applications.}
 
 %%================================%%
 %% Sample for structured abstract %%
@@ -134,7 +185,7 @@
 % 
 % \textbf{Conclusion:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.}
 
-\keywords{keyword1, Keyword2, Keyword3, Keyword4}
+\keywords{Multi-agent system, LLM, Inter-professional, Collaborative, IPE, IPP, Healthcare, AI}
 
 %%\pacs[JEL Classification]{D8, H51}
 
@@ -144,20 +195,191 @@
 
 \section{Introduction}\label{sec1}
 
-The Introduction section, of referenced text \cite{bib1} expands on the background of the work (some overlap with the Abstract is acceptable). The introduction should not include subheadings.
+In modern healthcare, the complexity of patient needs necessitates collaborative approaches among diverse healthcare professionals. Interprofessional Education (IPE), as defined by the World Health Organization (WHO), occurs when ``students from two or more professions learn about, from and with each other to enable effective collaboration and improve health outcomes''~\cite{WHO2010}. Building upon this educational foundation, Interprofessional Practice (IPP) involves ``multiple health workers from different professional backgrounds working together with patients, families, carers, and communities to deliver the highest quality of care''~\cite{WHO2010}. These practices have been shown to enhance communication, reduce medical errors, and improve clinical effectiveness by aligning profession-specific expertise toward common goals.
 
-Springer Nature does not impose a strict layout as standard however authors are advised to check the individual requirements for the journal they are planning to submit to as there may be journal-level preferences. When preparing your text please also be aware that some stylistic choices are not supported in full text XML (publication version), including coloured font. These will not be replicated in the typeset article if it is accepted. 
+
+With the emergence of large language models (LLMs) in medical AI applications, there is growing interest in leveraging their capabilities to support or simulate such interprofessional reasoning. However, general-purpose LLMs often lack the role awareness and domain-specific context needed to replicate nuanced clinical decision-making, especially in multi-role environments. These models typically produce generic treatment plans that may overlook profession-specific insights critical to comprehensive patient care.
+
+In this work, we investigate how different LLM-based approaches perform in generating treatment plans for real-world IPE case studies. Specifically, we compare three paradigms: (1) a single general-purpose LLM, (2) a prompt-tuned LLM, and (3) \textit{MediSyn} — a novel AI-driven multi-agent system that simulates an interprofessional care team by dynamically instantiating specialized agents for each role mentioned in a case. Rather than hardcoding professions, MediSyn parses the team members from the input and assigns each agent domain-specific responsibilities. For example, a nurse agent is fine-tuned to provide insights into patient care, while an oncologist agent delivers targeted cancer treatment recommendations.
+
+Importantly, our goal is not to position MediSyn as a universally superior alternative, but rather to explore how such a system compares to more general-purpose LLM pipelines. We ask: \textit{Can simulating interprofessional dynamics through a role-specialized multi-agent framework provide advantages — or trade-offs — relative to current monolithic approaches?}
+
+Moreover, our extensive review of the current literature and AI applications in healthcare indicates that, although there are various multi-agent systems addressing tasks such as emergency response~\cite{han2024development}, interdisciplinary decision support~\cite{wilk2016semantic}, and cancer care information management~\cite{mohammadzadeh2013multi}, no existing system to our knowledge has been designed to tackle real IPE case studies using generative AI.
+
+Through this work, we aim to provide empirical insights into the capabilities and limitations of these AI paradigms in replicating interprofessional treatment planning, and inform the design of future AI systems for interprofessional healthcare collaboration.
+
+The remainder of this paper is organized as follows: Section~\ref{sec2} reviews related work on AI-driven medical systems, multi-agent approaches, and LLMs in healthcare. Section~\ref{sec3} describes our methodology, including the dataset, preprocessing strategies, baseline generation pipelines, and the design of the MediSyn framework. Section~\ref{sec4} presents our experimental results comparing single LLM, prompt-tuned LLM, and multi-agent outputs across multiple evaluation metrics. Section~\ref{sec5} discusses key insights, limitations, and open challenges. Finally, Section~\ref{sec6} concludes the paper and suggests directions for future work.
+
 
 \section{Related Work}\label{sec2}
 
+The integration of large language models (LLMs) in healthcare has spurred growing interest in their use for tasks such as clinical decision support, treatment recommendation, and patient education~\cite{singhal2023gpt4med, biswas2023role, patel2023chatgpt, nori2023capabilities}. While models like GPT-3 and GPT-4 have demonstrated impressive capabilities in understanding and generating medical language~\cite{lee2023benefits, li2023can}, they often lack the role-specific contextual awareness necessary for profession-targeted treatment planning~\cite{valmeek2023prompt}. Their responses may be overly generic, missing the nuanced reasoning that emerges from collaborative healthcare practice involving diverse specialties.
+
+To better address distributed reasoning, multi-agent systems (MAS) have been explored extensively in healthcare.MAS architectures simulate collaboration by assigning responsibilities to individual agents representing different medical roles~\cite{ghazal2014multiagent, lemke2011agent, abidi2017ontology}.. Applications include chronic disease management, prehospital triage, cancer care coordination, and emergency response systems. These systems enable real-time communication, adaptive decision-making, and decentralized control — making them well-suited for modeling complex healthcare processes~\cite{lemke2011agent, abidi2017ontology}.
+
+The emergence of LLM-powered MAS frameworks bridges the gap between generative text reasoning and collaborative simulation. For instance, ClinicalAgent~\cite{wang2024clinicalagent} demonstrates the use of GPT-4-based agents for simulating clinical trial coordination, where each agent is assigned a domain-specific function, such as patient recruitment or outcome analysis. Similarly, Han and Choi~\cite{han2024development} developed an LLM-based multi-agent system for emergency triage using the Korean Triage and Acuity Scale (KTAS), dynamically orchestrating agents like triage nurse, physician, and coordinator for treatment planning. These systems highlight the growing feasibility of combining natural language understanding with agent-based role simulation in medicine.
+
+However, existing work has not yet addressed interprofessional education (IPE) or interprofessional practice (IPP) case studies using generative AI in a fully dynamic, role-adaptive way. Most prior systems rely on static agent configurations, do not reflect the diversity of real-world care teams, or are not designed for educational or collaborative training contexts~\cite{wilk2016semantic, valmeek2023prompt}. Our work builds upon these foundations by introducing MediSyn, an LLM-powered multi-agent system that dynamically extracts team roles from real IPE case studies and assigns them to profession-specialized agents. Rather than aiming to outperform prior methods, we explore how this novel architecture compares to single-LLM and prompt-tuned LLM baselines in generating treatment plans, particularly in scenarios requiring collaborative, role-sensitive reasoning.
+
+
 \section{Methodology}\label{sec3}
 
+This section provides an overview of the methodology adopted in this work. Our approach is designed to evaluate the performance of a novel multi-agent AI system, \textit{MediSyn}, for generating treatment plans in Interprofessional Education (IPE) healthcare scenarios. The methodology involves a structured pipeline, progressing from data extraction and preprocessing to various LLM-based generation approaches, culminating in the design and evaluation of the proposed multi-agent framework.
+
+At a high level, our methodology can be divided into the following major components:
+
+\begin{itemize} \item \textbf{Data Collection:} We source our data from 18 publicly available healthcare case studies provided by the American Speech-Language-Hearing Association (ASHA). These case studies serve as authentic real-world examples of interprofessional collaboration in healthcare settings.
+\item \textbf{Data Preprocessing:} The unstructured case study narratives are processed into a structured JSON format suitable for LLM input. This involves both manual extraction and automated extraction using LLMs, allowing us to compare the effectiveness of both approaches.
+
+\item \textbf{Baseline Approaches:} We establish two baseline methods for treatment plan generation:
+\begin{enumerate}
+    \item A \textit{Single LLM} pipeline where the entire case study is passed to a general-purpose LLM (like GPT-4 or Claude) to generate a treatment plan.
+    \item A \textit{Prompt-Tuned LLM} pipeline where the prompt is carefully crafted to simulate specific roles or expectations from the model.
+\end{enumerate}
+
+\item \textbf{MediSyn: Proposed Multi-Agent System:} Moving beyond single LLM baselines, we introduce MediSyn, a novel synergistic multi-agent architecture. For each case study, MediSyn dynamically identifies the healthcare team members mentioned and creates specialized agents — each representing a profession involved in the case. These agents are constrained to their domain knowledge and collaborate sequentially to generate the final treatment plan, thereby closely simulating real-world interprofessional collaboration.
+
+\item \textbf{Evaluation Metrics:} To rigorously evaluate and compare the outputs of the Single LLM, Prompt-Tuned LLM, and MediSyn systems, we employ both automated and human-centric evaluation methods:
+\begin{itemize}
+    \item BLEU Score
+    \item ROUGE Score
+    \item LLM-as-a-Judge evaluations (for qualitative and contextual judgment)
+\end{itemize}
+\end{itemize}
+
 \subsection{Data Description}\label{subsec3.1}
+
+The dataset used in this study consists of a curated collection of real-world healthcare case studies sourced from the American Speech-Language-Hearing Association (ASHA) \cite{asha}. These case studies are publicly available on the ASHA IPE/IPP portal and are specifically designed to highlight examples of interprofessional collaboration across diverse healthcare scenarios. 
+
+Each case study presents a unique clinical situation involving patients from varying demographics and medical backgrounds, including conditions such as cleft palate, traumatic brain injury, autism spectrum disorder, NICU interventions, and rehabilitation settings. Importantly, each case involves a multidisciplinary team working together to provide holistic patient care. Every case study in this dataset typically contains:
+\begin{itemize}
+    \item A clinical background of the patient
+    \item A list of healthcare team members involved (e.g., Nurse, Physician, Speech-Language Pathologist, Audiologist, Occupational Therapist)
+    \item The collaborative assessment process and challenges faced
+    \item The treatment plan co-developed by the team
+    \item Patient outcomes and post-intervention progress
+\end{itemize} 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Fig/data1.png}
+    \caption{\centering 1st page of the case study with Patient Info, summary, and the team members}
+    \label{fig:Case study (1st page)}
+\end{figure}
+
+The above diagram is a view of some of the elements in one particular case study. Each ASHA case study follows a more-or-less consistent structure comprising several distinct sections or headers, namely: \begin{itemize} \item \textbf{Summary:} A brief narrative of the case and its significance. \item \textbf{Patient Info:} Demographic and clinical details about the patient. \item \textbf{Meet The Team:} List of interprofessional healthcare team members involved. \item \textbf{Background:} Detailed description of the patient's history, presenting problems, and symptoms. \item \textbf{How They Collaborated:} A narrative explanation of the collaborative process among team members. \item \textbf{Outcome:} The outcome of the case. \item \textbf{Ongoing collaboration:} Whether the team is still involved in the process of treatment or in the patient's care. \item \textbf{History and Concerns:} Essentially a copy of the background section. \item \textbf{Assessment Plan:} The roles and responsibilities of each professional in evaluating the patient. \item \textbf{Assessment Results:} Key diagnostic findings from each professional’s evaluation. \item \textbf{IPP Treatment Plan:} The final collaboratively agreed treatment plan. \item \textbf{Treatment Outcomes:} Follow-up details on patient progress. \item \textbf{Team Follow-Up:} Plan for continued interprofessional communication and monitoring. \end{itemize}
+To understand the features better, here's a snapshot of the raw data:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Fig/data3.png}
+    \caption{\centering Data Features}
+    \label{fig:Case study (Features)}
+\end{figure}
+
+In total, the dataset contains 18 such case studies. These cases serve two main purposes in our research:
+\begin{enumerate}
+    \item As input data for generating treatment plans using baseline single LLM approaches.
+    \item As structured case scenarios for instantiating profession-specific agents within the MediSyn multi-agent framework.
+\end{enumerate}
+
+Out of the 18 case studies available at the time of our work, we utilized 15 case studies for our experiments. The remaining 3 case studies were excluded from our analysis due to the absence of a documented Interprofessional Practice (IPP) treatment plan and a few other parts, which are critical components for our evaluation and generation pipeline.
+This dataset is highly suitable for simulating IPE scenarios as it authentically captures real-world interprofessional teamwork, role-specific responsibilities, and collaborative decision-making processes — all of which are essential for modeling and evaluating agentic behavior in our proposed system.
+
+
 \subsection{Data Preprocessing}\label{subsec3.2}
+
+Now that we have talked about the various features that a case study has. For the purpose of our work, we identified and extracted the follwing essential features from each case study, which directly support the downstream treatment plan generation and multi-agent modeling tasks:
+
+\begin{table}[h]
+\centering
+\caption{Extracted Fields}
+\renewcommand{\arraystretch}{1.3} % row height
+\rowcolors{2}{blue!5}{white}     % alternate row colors
+\begin{tabularx}{\textwidth}{|l|X|}
+\toprule
+\rowcolor{blue!15}
+\texttt{Field} & \textbf{Description} \\
+\midrule
+\texttt{patient\_info}       & Includes patient's name, age, and diagnosis. \\
+\texttt{summary}             & Summary of the case. \\
+\texttt{team\_members}       & List of involved professionals (Meet the Team section). \\
+\texttt{background}          & Patient's background. \\
+\texttt{assessment\_plan}    & Evaluation responsibilities assigned to each professional (Assessment Plan section). \\
+\texttt{assessment\_results} & Results of diagnostic evaluations (Assessment Results section). \\
+\texttt{treatment\_plan}     & The final Interprofessional Practice (IPP) treatment plan co-developed by the team (IPP Treatment Plan section). \\
+\bottomrule
+\end{tabularx}
+\label{tab:extracted_fields}
+\end{table}
+
+
+The extracted information was organized into a clean JSON structure as shown below:
+\begin{lstlisting}[language=json, caption={Structure of extracted JSON from case study}, linewidth=\textwidth]
+{
+  "patient_info": {
+    ...
+  },
+  "summary": "...",
+  "team_members": [
+    ...
+  ],
+  "background": "...",
+  "assessment_plan": "...",
+  "assessment_results": "...",
+  "treatment_plan": "..."
+}
+\end{lstlisting}
+
+This structured representation enables a standardized and consistent input format for all subsequent methods — including baseline LLM approaches and our proposed MediSyn multi-agent system. Thing to note is the treatment plan is our target feature.
+
+To transform the ASHA case studies into a structured format suitable for downstream LLM processing and multi-agent generation, we employed two complementary data preprocessing strategies: (1) manual extraction, and (2) automated extraction using LLMs. These pipelines enabled consistent representation of each case study while also facilitating a comparison between human- and machine-curated inputs.
+
 \subsubsection{Manual}\label{subsec3.2.1}
+
+In the manual preprocessing approach, the data from each ASHA case study was directly extracted from the raw PDF files without any alterations or modifications. Specifically, the relevant sections corresponding to the identified features were carefully copy-pasted from the case studies and structured into JSON format as described earlier.
+
+This method ensures that the extracted data maintains maximum fidelity to the original case study content, preserving the exact phrasing, structure, and information as presented in the source. The manually curated JSON files therefore serve as the most authentic representation of the data and act as the ground truth for comparison against automated methods.
+
+This approach, while labor-intensive, was crucial in providing clean, reliable data for evaluating the performance of LLM-based extraction methods and the subsequent treatment plan generation.
+
 \subsubsection{LLM}\label{subsec3.2.2}
 
+In contrast to the manual extraction approach, we also explored an automated extraction pipeline using state-of-the-art Large Language Models (LLMs) to convert the ASHA case studies from raw PDFs into structured JSON format.
+
+We utilized three different LLMs to perform this task: \begin{itemize} \item LLaMA 3.2 70B Instruct model (accessed via AWS Bedrock) \item Claude 3.5 Sonnet (accessed via AWS Bedrock) \item GPT-4o (accessed via OpenAI API) \end{itemize}
+
+Each of these models was provided with the raw text extracted from the PDF files using unstructured library, along with a carefully crafted prompt instructing the model to extract all relevant information and output it in the exact JSON format described earlier. The prompt structure remained largely consistent across models, with minor adjustments specific to the respective LLM formatting requirements. The detailed design and content of the prompt used for this extraction process is discussed in Section~\ref{subsec4.1}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/data_extraction_process.png}
+    \caption{\centering Data Extraction Process}
+    \label{fig:data_ext}
+\end{figure}
+We leveraged a dedicated Python pipeline that involved extracting structured text from PDFs using the Unstructured library. A specialized system prompt was then created to instruct the model to extract specific fields, including patient info, summary, team members, background, assessment plan, assessment results, and treatment plan. This prompt was passed to the LLaMA 3.2 model deployed on AWS Bedrock via the Bedrock Runtime client. The generated response was parsed to extract valid JSON content, which was subsequently saved into a structured JSON file.
+
+We repeated the same extraction process individually for all three models, thereby generating three separate sets of JSON files — one from each LLM.
+
+Going forward, these generated datasets were exclusively used with their respective models for downstream treatment plan generation tasks. Specifically: \begin{itemize} \item LLaMA-generated JSONs were used as input when evaluating LLaMA's performance for treatment plan generation. \item Claude-generated JSONs were used with Claude for treatment generation. \item GPT-generated JSONs were used with GPT for treatment generation. \end{itemize}
+The details are furthur explained in Sections~\ref{subsec4.2},~\ref{subsec4.3.2} and ~\ref{subsec4.4.2}
+
+This design choice allowed us to maintain consistency in the data-model pairing while simultaneously evaluating the extraction and generation capabilities of each LLM independently.
+
 \subsection{Single LLM}\label{subsec3.3}
+
+As a foundational baseline, we first explored a straightforward single-LLM approach for treatment plan generation. In this method, a general-purpose large language model (LLM) is prompted with the structured case study data — in JSON format — and tasked with generating a comprehensive treatment plan for the patient described.
+
+This approach serves two primary purposes:
+(1) It establishes a baseline performance level for evaluating how well a single, monolithic LLM can handle interprofessional medical reasoning, and
+(2) It allows us to contrast the effectiveness of centralized, undifferentiated AI decision-making with our proposed multi-agent collaborative system, MediSyn.
+
+In the single-LLM setup, we use three different models for comparative analysis: \begin{itemize} \item GPT-4o (OpenAI) \item Claude 3.5 Sonnet (Anthropic via AWS Bedrock) \item LLaMA 3.2 70B Instruct (Meta via AWS Bedrock) \end{itemize}
+
+Each model is provided the same structured input (case study JSON), which includes key components such as patient information, background, team members, assessment plan, and diagnostic results. The final field, the treatment plan, is left blank and is expected to be generated by the LLM itself based on the context provided in the other fields.
+
+The system prompt instructs the model to act as a virtual care team, combining the insights of all team members to propose a unified treatment plan. The prompt also emphasizes clinical accuracy, role-sensitive insights, and realistic medical interventions. The specific prompts used for each LLM are documented in Section~\ref{subsec4.1}.
+
+This single-model approach provides a valuable reference point for understanding the limitations of current general-purpose LLMs in healthcare decision-making, particularly when tasked with replicating the depth and nuance of interprofessional collaboration. As we demonstrate in our experimental results, while these models are capable of generating plausible treatment plans, they often lack the role specificity, contextual grounding, and collaborative reasoning that our multi-agent system aims to provide.
+
 \subsection{Prompt Tuned LLM}\label{subsec3.4}
 \subsection{MediSyn: A Synergistic multi-agent AI system for IPE}\label{subsec3.5}
 \subsection{Evaluation Methods}\label{subsec3.6}
@@ -168,6 +390,43 @@ Springer Nature does not impose a strict layout as standard however authors are 
 
 \section{Experiments and Results}\label{sec4}
 \subsection{Prompt Engineering}\label{subsec4.1}
+
+Prompt Engineering played a crucial role in our methodology, particularly in extracting structured information from unstructured case study PDFs using Large Language Models (LLMs). Given the narrative and diverse formatting styles of the ASHA case studies, designing effective prompts was critical to ensuring accurate and consistent extraction of relevant data fields.
+
+\begin{tcolorbox}[mypromptbox, title={Prompt used for LLaMA 3.2 to extract structured JSON from case study PDF}]
+\begin{lstlisting}
+<|begin_of_text|>
+<|start_header_id|>system<|end_header_id|>
+You are a medical document processor. Extract ALL information into this EXACT JSON format:
+{
+  "patient_info": {
+    "name": "string", 
+    "age": "string",
+    "diagnosis": ["string"]
+  },
+  "summary": "Concise clinical summary",
+  "team_members": ["string"],
+  "background": "Medical history and key events",
+  "assessment_plan": "The assessment plan section including the individual team member assessments",
+  "assessment_results": "The assessment results section including the individual team member assessments results",
+  "treatment_plan": "The Treatment plan section including the individual team member's take on the treatment plan"
+}
+
+RULES:
+1. Output ONLY valid JSON
+2. Use exact field names
+3. Never add comments
+4. Maintain original medical terms
+5. Be explanatory and don't summarize the information
+<|end_header_id|>
+<|start_header_id|>user<|end_header_id|>
+PDF CONTENT:
+{raw_pdf_content}
+<|eot_id|>
+<|start_header_id|>assistant<|end_header_id|>
+\end{lstlisting}
+\end{tcolorbox}
+
 \subsection{Data Preparation comparision - OpenAI vs Claude vs Llama}\label{subsec4.2}
 \subsection{Treatment Plans comparision - OpenAI vs Claude vs Llama}\label{subsec4.3}
 \subsubsection{Manually prepared data}\label{subsec4.3.1}
@@ -185,393 +444,6 @@ Springer Nature does not impose a strict layout as standard however authors are 
 The authors confirm that the datasets generated during and/or analyzed during the current study are available from the corresponding author on reasonable request.
 
 
-
-\section{Results}\label{sec2}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\section{This is an example for first level head---section head}\label{sec3}
-
-\subsection{This is an example for second level head---subsection head}\label{subsec2}
-
-\subsubsection{This is an example for third level head---subsubsection head}\label{subsubsec2}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. 
-
-\section{Equations}\label{sec4}
-
-Equations in \LaTeX\ can either be inline or on-a-line by itself (``display equations''). For
-inline equations use the \verb+$...$+ commands. E.g.: The equation
-$H\psi = E \psi$ is written via the command \verb+$H \psi = E \psi$+.
-
-For display equations (with auto generated equation numbers)
-one can use the equation or align environments:
-\begin{equation}
-\|\tilde{X}(k)\|^2 \leq\frac{\sum\limits_{i=1}^{p}\left\|\tilde{Y}_i(k)\right\|^2+\sum\limits_{j=1}^{q}\left\|\tilde{Z}_j(k)\right\|^2 }{p+q}.\label{eq1}
-\end{equation}
-where,
-\begin{align}
-D_\mu &=  \partial_\mu - ig \frac{\lambda^a}{2} A^a_\mu \nonumber \\
-F^a_{\mu\nu} &= \partial_\mu A^a_\nu - \partial_\nu A^a_\mu + g f^{abc} A^b_\mu A^a_\nu \label{eq2}
-\end{align}
-Notice the use of \verb+\nonumber+ in the align environment at the end
-of each line, except the last, so as not to produce equation numbers on
-lines where no equation numbers are required. The \verb+\label{}+ command
-should only be used at the last line of an align environment where
-\verb+\nonumber+ is not used.
-\begin{equation}
-Y_\infty = \left( \frac{m}{\textrm{GeV}} \right)^{-3}
-    \left[ 1 + \frac{3 \ln(m/\textrm{GeV})}{15}
-    + \frac{\ln(c_2/5)}{15} \right]
-\end{equation}
-The class file also supports the use of \verb+\mathbb{}+, \verb+\mathscr{}+ and
-\verb+\mathcal{}+ commands. As such \verb+\mathbb{R}+, \verb+\mathscr{R}+
-and \verb+\mathcal{R}+ produces $\mathbb{R}$, $\mathscr{R}$ and $\mathcal{R}$
-respectively (refer Subsubsection~\ref{subsubsec2}).
-
-\section{Tables}\label{sec5}
-
-Tables can be inserted via the normal table and tabular environment. To put
-footnotes inside tables you should use \verb+\footnotetext[]{...}+ tag.
-The footnote appears just below the table itself (refer Tables~\ref{tab1} and \ref{tab2}). 
-For the corresponding footnotemark use \verb+\footnotemark[...]+
-
-\begin{table}[h]
-\caption{Caption text}\label{tab1}%
-\begin{tabular}{@{}llll@{}}
-\toprule
-Column 1 & Column 2  & Column 3 & Column 4\\
-\midrule
-row 1    & data 1   & data 2  & data 3  \\
-row 2    & data 4   & data 5\footnotemark[1]  & data 6  \\
-row 3    & data 7   & data 8  & data 9\footnotemark[2]  \\
-\botrule
-\end{tabular}
-\footnotetext{Source: This is an example of table footnote. This is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote. This is an example of table footnote.}
-\footnotetext[2]{Example for a second table footnote. This is an example of table footnote.}
-\end{table}
-
-\noindent
-The input format for the above table is as follows:
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{verbatim}
-\begin{table}[<placement-specifier>]
-\caption{<table-caption>}\label{<table-label>}%
-\begin{tabular}{@{}llll@{}}
-\toprule
-Column 1 & Column 2 & Column 3 & Column 4\\
-\midrule
-row 1 & data 1 & data 2	 & data 3 \\
-row 2 & data 4 & data 5\footnotemark[1] & data 6 \\
-row 3 & data 7 & data 8	 & data 9\footnotemark[2]\\
-\botrule
-\end{tabular}
-\footnotetext{Source: This is an example of table footnote. 
-This is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote.
-This is an example of table footnote.}
-\footnotetext[2]{Example for a second table footnote. 
-This is an example of table footnote.}
-\end{table}
-\end{verbatim}
-\bigskip
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-
-\begin{table}[h]
-\caption{Example of a lengthy table which is set to full textwidth}\label{tab2}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lcccccc}
-\toprule%
-& \multicolumn{3}{@{}c@{}}{Element 1\footnotemark[1]} & \multicolumn{3}{@{}c@{}}{Element 2\footnotemark[2]} \\\cmidrule{2-4}\cmidrule{5-7}%
-Project & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ \\
-\midrule
-Element 3  & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$\\
-Element 4  & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$\\
-\botrule
-\end{tabular*}
-\footnotetext{Note: This is an example of table footnote. This is an example of table footnote this is an example of table footnote this is an example of~table footnote this is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote.}
-\footnotetext[2]{Example for a second table footnote.}
-\end{table}
-
-In case of double column layout, tables which do not fit in single column width should be set to full text width. For this, you need to use \verb+\begin{table*}+ \verb+...+ \verb+\end{table*}+ instead of \verb+\begin{table}+ \verb+...+ \verb+\end{table}+ environment. Lengthy tables which do not fit in textwidth should be set as rotated table. For this, you need to use \verb+\begin{sidewaystable}+ \verb+...+ \verb+\end{sidewaystable}+ instead of \verb+\begin{table*}+ \verb+...+ \verb+\end{table*}+ environment. This environment puts tables rotated to single column width. For tables rotated to double column width, use \verb+\begin{sidewaystable*}+ \verb+...+ \verb+\end{sidewaystable*}+.
-
-\begin{sidewaystable}
-\caption{Tables which are too long to fit, should be written using the ``sidewaystable'' environment as shown here}\label{tab3}
-\begin{tabular*}{\textheight}{@{\extracolsep\fill}lcccccc}
-\toprule%
-& \multicolumn{3}{@{}c@{}}{Element 1\footnotemark[1]}& \multicolumn{3}{@{}c@{}}{Element\footnotemark[2]} \\\cmidrule{2-4}\cmidrule{5-7}%
-Projectile & Energy	& $\sigma_{calc}$ & $\sigma_{expt}$ & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ \\
-\midrule
-Element 3 & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$ \\
-Element 4 & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$ \\
-Element 5 & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$ \\
-Element 6 & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$ \\
-\botrule
-\end{tabular*}
-\footnotetext{Note: This is an example of table footnote this is an example of table footnote this is an example of table footnote this is an example of~table footnote this is an example of table footnote.}
-\footnotetext[1]{This is an example of table footnote.}
-\end{sidewaystable}
-
-\section{Figures}\label{sec6}
-
-As per the \LaTeX\ standards you need to use eps images for \LaTeX\ compilation and \verb+pdf/jpg/png+ images for \verb+PDFLaTeX+ compilation. This is one of the major difference between \LaTeX\ and \verb+PDFLaTeX+. Each image should be from a single input .eps/vector image file. Avoid using subfigures. The command for inserting images for \LaTeX\ and \verb+PDFLaTeX+ can be generalized. The package used to insert images in \verb+LaTeX/PDFLaTeX+ is the graphicx package. Figures can be inserted via the normal figure environment as shown in the below example:
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{verbatim}
-\begin{figure}[<placement-specifier>]
-\centering
-\includegraphics{<eps-file>}
-\caption{<figure-caption>}\label{<figure-label>}
-\end{figure}
-\end{verbatim}
-\bigskip
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\textwidth]{Fig/fig.eps}
-\caption{This is a widefig. This is an example of long caption this is an example of long caption  this is an example of long caption this is an example of long caption}\label{fig1}
-\end{figure}
-
-In case of double column layout, the above format puts figure captions/images to single column width. To get spanned images, we need to provide \verb+\begin{figure*}+ \verb+...+ \verb+\end{figure*}+.
-
-For sample purpose, we have included the width of images in the optional argument of \verb+\includegraphics+ tag. Please ignore this. 
-
-\section{Algorithms, Program codes and Listings}\label{sec7}
-
-Packages \verb+algorithm+, \verb+algorithmicx+ and \verb+algpseudocode+ are used for setting algorithms in \LaTeX\ using the format:
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{verbatim}
-\begin{algorithm}
-\caption{<alg-caption>}\label{<alg-label>}
-\begin{algorithmic}[1]
-. . .
-\end{algorithmic}
-\end{algorithm}
-\end{verbatim}
-\bigskip
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-
-You may refer above listed package documentations for more details before setting \verb+algorithm+ environment. For program codes, the ``verbatim'' package is required and the command to be used is \verb+\begin{verbatim}+ \verb+...+ \verb+\end{verbatim}+. 
-
-Similarly, for \verb+listings+, use the \verb+listings+ package. \verb+\begin{lstlisting}+ \verb+...+ \verb+\end{lstlisting}+ is used to set environments similar to \verb+verbatim+ environment. Refer to the \verb+lstlisting+ package documentation for more details.
-
-A fast exponentiation procedure:
-
-\lstset{texcl=true,basicstyle=\small\sf,commentstyle=\small\rm,mathescape=true,escapeinside={(*}{*)}}
-\begin{lstlisting}
-begin
-  for $i:=1$ to $10$ step $1$ do
-      expt($2,i$);  
-      newline() od                (*\textrm{Comments will be set flush to the right margin}*)
-where
-proc expt($x,n$) $\equiv$
-  $z:=1$;
-  do if $n=0$ then exit fi;
-     do if odd($n$) then exit fi;                 
-        comment: (*\textrm{This is a comment statement;}*)
-        $n:=n/2$; $x:=x*x$ od;
-     { $n>0$ };
-     $n:=n-1$; $z:=z*x$ od;
-  print($z$). 
-end
-\end{lstlisting}
-
-\begin{algorithm}
-\caption{Calculate $y = x^n$}\label{algo1}
-\begin{algorithmic}[1]
-\Require $n \geq 0 \vee x \neq 0$
-\Ensure $y = x^n$ 
-\State $y \Leftarrow 1$
-\If{$n < 0$}\label{algln2}
-        \State $X \Leftarrow 1 / x$
-        \State $N \Leftarrow -n$
-\Else
-        \State $X \Leftarrow x$
-        \State $N \Leftarrow n$
-\EndIf
-\While{$N \neq 0$}
-        \If{$N$ is even}
-            \State $X \Leftarrow X \times X$
-            \State $N \Leftarrow N / 2$
-        \Else[$N$ is odd]
-            \State $y \Leftarrow y \times X$
-            \State $N \Leftarrow N - 1$
-        \EndIf
-\EndWhile
-\end{algorithmic}
-\end{algorithm}
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{minipage}{\hsize}%
-\lstset{frame=single,framexleftmargin=-1pt,framexrightmargin=-17pt,framesep=12pt,linewidth=0.98\textwidth,language=pascal}% Set your language (you can change the language for each code-block optionally)
-%%% Start your code-block
-\begin{lstlisting}
-for i:=maxint to 0 do
-begin
-{ do nothing }
-end;
-Write('Case insensitive ');
-Write('Pascal keywords.');
-\end{lstlisting}
-\end{minipage}
-
-\section{Cross referencing}\label{sec8}
-
-Environments such as figure, table, equation and align can have a label
-declared via the \verb+\label{#label}+ command. For figures and table
-environments use the \verb+\label{}+ command inside or just
-below the \verb+\caption{}+ command. You can then use the
-\verb+\ref{#label}+ command to cross-reference them. As an example, consider
-the label declared for Figure~\ref{fig1} which is
-\verb+\label{fig1}+. To cross-reference it, use the command 
-\verb+Figure \ref{fig1}+, for which it comes up as
-``Figure~\ref{fig1}''. 
-
-To reference line numbers in an algorithm, consider the label declared for the line number 2 of Algorithm~\ref{algo1} is \verb+\label{algln2}+. To cross-reference it, use the command \verb+\ref{algln2}+ for which it comes up as line~\ref{algln2} of Algorithm~\ref{algo1}.
-
-\subsection{Details on reference citations}\label{subsec7}
-
-Standard \LaTeX\ permits only numerical citations. To support both numerical and author-year citations this template uses \verb+natbib+ \LaTeX\ package. For style guidance please refer to the template user manual.
-
-Here is an example for \verb+\cite{...}+: \cite{bib1}. Another example for \verb+\citep{...}+: \citep{bib2}. For author-year citation mode, \verb+\cite{...}+ prints Jones et al. (1990) and \verb+\citep{...}+ prints (Jones et al., 1990).
-
-All cited bib entries are printed at the end of this article: \cite{bib3}, \cite{bib4}, \cite{bib5}, \cite{bib6}, \cite{bib7}, \cite{bib8}, \cite{bib9}, \cite{bib10}, \cite{bib11}, \cite{bib12} and \cite{bib13}.
-
-\section{Examples for theorem like environments}\label{sec10}
-
-For theorem like environments, we require \verb+amsthm+ package. There are three types of predefined theorem styles exists---\verb+thmstyleone+, \verb+thmstyletwo+ and \verb+thmstylethree+ 
-
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-\bigskip
-\begin{tabular}{|l|p{19pc}|}
-\hline
-\verb+thmstyleone+ & Numbered, theorem head in bold font and theorem text in italic style \\\hline
-\verb+thmstyletwo+ & Numbered, theorem head in roman font and theorem text in italic style \\\hline
-\verb+thmstylethree+ & Numbered, theorem head in bold font and theorem text in roman style \\\hline
-\end{tabular}
-\bigskip
-%%=============================================%%
-%% For presentation purpose, we have included  %%
-%% \bigskip command. Please ignore this.       %%
-%%=============================================%%
-
-For mathematics journals, theorem styles can be included as shown in the following examples:
-
-\begin{theorem}[Theorem subhead]\label{thm1}
-Example theorem text. Example theorem text. Example theorem text. Example theorem text. Example theorem text. 
-Example theorem text. Example theorem text. Example theorem text. Example theorem text. Example theorem text. 
-Example theorem text. 
-\end{theorem}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{proposition}
-Example proposition text. Example proposition text. Example proposition text. Example proposition text. Example proposition text. 
-Example proposition text. Example proposition text. Example proposition text. Example proposition text. Example proposition text. 
-\end{proposition}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{example}
-Phasellus adipiscing semper elit. Proin fermentum massa
-ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend
-at, accumsan nec, suscipit a, ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. 
-\end{example}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{remark}
-Phasellus adipiscing semper elit. Proin fermentum massa
-ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend
-at, accumsan nec, suscipit a, ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. 
-\end{remark}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{definition}[Definition sub head]
-Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. 
-\end{definition}
-
-Additionally a predefined ``proof'' environment is available: \verb+\begin{proof}+ \verb+...+ \verb+\end{proof}+. This prints a ``Proof'' head in italic font style and the ``body text'' in roman font style with an open square at the end of each proof environment. 
-
-\begin{proof}
-Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. 
-\end{proof}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{proof}[Proof of Theorem~{\upshape\ref{thm1}}]
-Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. 
-\end{proof}
-
-\noindent
-For a quote environment, use \verb+\begin{quote}...\end{quote}+
-\begin{quote}
-Quoted text example. Aliquam porttitor quam a lacus. Praesent vel arcu ut tortor cursus volutpat. In vitae pede quis diam bibendum placerat. Fusce elementum
-convallis neque. Sed dolor orci, scelerisque ac, dapibus nec, ultricies ut, mi. Duis nec dui quis leo sagittis commodo.
-\end{quote}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text (refer Figure~\ref{fig1}). Sample body text. Sample body text. Sample body text (refer Table~\ref{tab3}). 
-
-\section{Methods}\label{sec11}
-
-Topical subheadings are allowed. Authors must ensure that their Methods section includes adequate experimental and characterization data necessary for others in the field to reproduce their work. Authors are encouraged to include RIIDs where appropriate. 
-
-\textbf{Ethical approval declarations} (only required where applicable) Any article reporting experiment/s carried out on (i)~live vertebrate (or higher invertebrates), (ii)~humans or (iii)~human samples must include an unambiguous statement within the methods section that meets the following requirements: 
-
-\begin{enumerate}[1.]
-\item Approval: a statement which confirms that all experimental protocols were approved by a named institutional and/or licensing committee. Please identify the approving body in the methods section
-
-\item Accordance: a statement explicitly saying that the methods were carried out in accordance with the relevant guidelines and regulations
-
-\item Informed consent (for experiments involving humans or human tissue samples): include a statement confirming that informed consent was obtained from all participants and/or their legal guardian/s
-\end{enumerate}
-
-If your manuscript includes potentially identifying patient/participant information, or if it describes human transplantation research, or if it reports results of a clinical trial then  additional information will be required. Please visit (\url{https://www.nature.com/nature-research/editorial-policies}) for Nature Portfolio journals, (\url{https://www.springer.com/gp/authors-editors/journal-author/journal-author-helpdesk/publishing-ethics/14214}) for Springer Nature journals, or (\url{https://www.biomedcentral.com/getpublished/editorial-policies\#ethics+and+consent}) for BMC.
-
-\section{Discussion}\label{sec12}
-
-Discussions should be brief and focused. In some disciplines use of Discussion or `Conclusion' is interchangeable. It is not mandatory to use both. Some journals prefer a section `Results and Discussion' followed by a section `Conclusion'. Please refer to Journal-level guidance for any specific requirements. 
-
-\section{Conclusion}\label{sec13}
-
-Conclusions may be used to restate your hypothesis or research question, restate your major findings, explain the relevance and the added value of your work, highlight any limitations of your study, describe future directions for research and recommendations. 
-
-In some disciplines use of Discussion or 'Conclusion' is interchangeable. It is not mandatory to use both. Please refer to Journal-level guidance for any specific requirements. 
-
-\backmatter
 
 \bmhead{Supplementary information}
 
