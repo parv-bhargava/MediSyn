@@ -219,6 +219,8 @@ To better address distributed reasoning, multi-agent systems (MAS) have been exp
 
 The emergence of LLM-powered MAS frameworks bridges the gap between generative text reasoning and collaborative simulation. For instance, ClinicalAgent~\cite{wang2024clinicalagent} demonstrates the use of GPT-4-based agents for simulating clinical trial coordination, where each agent is assigned a domain-specific function, such as patient recruitment or outcome analysis. Similarly, Han and Choi~\cite{han2024development} developed an LLM-based multi-agent system for emergency triage using the Korean Triage and Acuity Scale (KTAS), dynamically orchestrating agents like triage nurse, physician, and coordinator for treatment planning. These systems highlight the growing feasibility of combining natural language understanding with agent-based role simulation in medicine.
 
+Recent advancements have introduced sophisticated LLM-based multi-agent frameworks tailored for complex medical tasks. For instance, the KG4Diagnosis system integrates hierarchical agents with knowledge graphs to enhance diagnostic reasoning across various medical specialties.~\cite{kg4diagnosis2024} Similarly, the MedAide framework employs specialized agents collaborating through retrieval-augmented generation to provide personalized healthcare services.~\cite{medaide2024} The MDAgents platform emphasizes adaptive collaboration among expert LLMs to tackle intricate medical decision-making processes.~\cite{mdagents2024} Furthermore, the Multi-Agent Conversation (MAC) framework has demonstrated significant improvements in diagnostic accuracy by simulating collaborative discussions among agents.~\cite{macframework2025} These innovations underscore the potential of multi-agent LLM systems to replicate the collaborative dynamics of healthcare professionals, offering promising avenues for enhancing clinical decision support.
+
 However, existing work has not yet addressed interprofessional education (IPE) or interprofessional practice (IPP) case studies using generative AI in a fully dynamic, role-adaptive way. Most prior systems rely on static agent configurations, do not reflect the diversity of real-world care teams, or are not designed for educational or collaborative training contexts~\cite{wilk2016semantic, valmeek2023prompt}. Our work builds upon these foundations by introducing MediSyn, an LLM-powered multi-agent system that dynamically extracts team roles from real IPE case studies and assigns them to profession-specialized agents. Rather than aiming to outperform prior methods, we explore how this novel architecture compares to single-LLM and prompt-tuned LLM baselines in generating treatment plans, particularly in scenarios requiring collaborative, role-sensitive reasoning.
 
 
@@ -378,9 +380,19 @@ Each model is provided the same structured input (case study JSON), which includ
 
 The system prompt instructs the model to act as a virtual care team, combining the insights of all team members to propose a unified treatment plan. The prompt also emphasizes clinical accuracy, role-sensitive insights, and realistic medical interventions. The specific prompts used for each LLM are documented in Section~\ref{subsec4.1}.
 
-This single-model approach provides a valuable reference point for understanding the limitations of current general-purpose LLMs in healthcare decision-making, particularly when tasked with replicating the depth and nuance of interprofessional collaboration. As we demonstrate in our experimental results, while these models are capable of generating plausible treatment plans, they often lack the role specificity, contextual grounding, and collaborative reasoning that our multi-agent system aims to provide.
+This single-model approach provides a valuable reference point for evaluating how general-purpose LLMs perform in the context of interprofessional treatment planning in healthcare decision-making, particularly when tasked with replicating the depth and nuance of interprofessional collaboration. As we demonstrate in our experimental results, while these models are capable of generating plausible treatment plans,they may lack the role-specific depth and collaborative dynamics found in interprofessional teams — which our multi-agent system is designed to simulate and explore.
 
 \subsection{Prompt Tuned LLM}\label{subsec3.4}
+
+To improve the performance of general-purpose large language models (LLMs) without altering their architecture, we explored a prompt-tuning strategy. In this approach, we continued using the same structured case study JSON as input, but paired it with a carefully engineered system prompt designed to elicit more profession-aware, collaborative treatment plans. The goal was to simulate interprofessional reasoning within a single LLM instance, without relying on an explicit multi-agent structure.
+
+Each LLM was prompted with a specific instruction that required it to produce a comprehensive treatment plan, explicitly considering the perspectives of each team member involved in the case. These prompts included role-awareness cues and formatting constraints to encourage more context-sensitive outputs. The complete prompt template used in this setting is documented in Section~\ref{subsec4.1}.
+
+The use of this structured, role-aware prompt was intended to guide the model toward producing outputs that better reflected the interprofessional dynamics and specialization seen in real healthcare settings. Importantly, while the model remained a single monolithic agent, the prompt encouraged it to emulate role segmentation and simulate internal collaboration among distinct clinical perspectives.
+
+We applied this prompt-tuned approach to all three LLMs under study—GPT-4o, Claude 3.5 Sonnet, and LLaMA 3.2—using their respective prompt syntax conventions. As detailed in Section~\ref{sec4}, the prompt-tuned variant often improved results on both automatic and human evaluation metrics compared to the baseline LLM setup, particularly in terms of plausibility, specificity, and overall contextual relevance. However, these gains varied across models and metrics, emphasizing that prompt tuning provides a meaningful but not universally optimal enhancement.
+
+
 \subsection{MediSyn: A Synergistic multi-agent AI system for IPE}\label{subsec3.5}
 \subsection{Evaluation Methods}\label{subsec3.6}
 \subsubsection{BLEU Score}\label{subsec3.6.1}
@@ -424,6 +436,19 @@ PDF CONTENT:
 {raw_pdf_content}
 <|eot_id|>
 <|start_header_id|>assistant<|end_header_id|>
+\end{lstlisting}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[mypromptbox, title={Prompt used for Prompt-Tuned LLM Treatment Plan Generation}]
+\begin{lstlisting}
+**Required Output Format**
+Create a comprehensive treatment plan with specific recommendations from each team member's perspective.
+
+Structure your response using EXACTLY these section headers:
+{team_member_roles}
+{For each team member}
+[Full Team Member Role Name]: [Recommendations]
 \end{lstlisting}
 \end{tcolorbox}
 
