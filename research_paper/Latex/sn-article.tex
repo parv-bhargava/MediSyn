@@ -401,11 +401,36 @@ We applied this prompt-tuned approach to all three LLMs under study—GPT-4o, Cl
 
 
 \section{Experiments and Results}\label{sec4}
+
+To evaluate the effectiveness of different language model configurations in generating interprofessional treatment plans, we conducted a series of experiments comparing three approaches: a single general-purpose LLM (base), a prompt-tuned LLM, and our proposed MediSyn multi-agent system. The objective was to assess the degree to which each method could produce outputs that were accurate, plausible, specific to team member roles, and complete in terms of clinical content coverage.
+
+All three methods were tested across three LLMs—GPT-4o, Claude 3.5 Sonnet, and LLaMA 3.2—under two data settings: one using case studies manually preprocessed into structured JSON, and the other using LLM-extracted structured data. We report results across both automatic evaluation metrics (BLEU, ROUGE) and human-centered criteria (accuracy, plausibility, specificity, and omission rate). Each method was applied consistently across all models and datasets, allowing for a controlled and comparative analysis.
+
+Rather than seeking to identify a single best-performing system, our goal is to understand how each approach behaves under different evaluation conditions and to explore the strengths and trade-offs inherent in prompt tuning and agent-based reasoning strategies.
+
 \subsection{Prompt Engineering}\label{subsec4.1}
 
-Prompt Engineering played a crucial role in our methodology, particularly in extracting structured information from unstructured case study PDFs using Large Language Models (LLMs). Given the narrative and diverse formatting styles of the ASHA case studies, designing effective prompts was critical to ensuring accurate and consistent extraction of relevant data fields.
+Prompt engineering is the practice of designing and refining input instructions—known as prompts—to guide large language models (LLMs) toward producing desired outputs without altering their underlying parameters.~\cite{liu2023pre} This technique leverages natural language cues to elicit specific behaviors from LLMs, enabling them to perform a wide range of tasks effectively. In healthcare, prompt engineering has been instrumental in various applications, such as enhancing patient–provider communication, streamlining clinical documentation, supporting medical education, and facilitating personalized care and shared decision-making \cite{prompt_engineering_healthcare}. For instance, well-crafted prompts have been used to generate patient-friendly explanations of medical concepts, aiding in bridging the knowledge gap between clinicians and patients \cite{prompt_engineering_patient_education}. Additionally, prompt engineering has supported clinical decision-making by guiding LLMs to provide recommendations aligned with evidence-based guidelines \cite{prompt_engineering_clinical_decision_support}. These examples underscore the potential of prompt engineering to enhance the utility of LLMs in complex, domain-specific scenarios within the healthcare sector.
 
-\begin{tcolorbox}[mypromptbox, title={Prompt used for LLaMA 3.2 to extract structured JSON from case study PDF}]
+In our project, prompt engineering was integral to four key stages of the pipeline:
+
+\begin{enumerate}
+    \item \textbf{Structured Data Extraction:} We developed prompts that guided LLMs to parse unstructured, narrative-style case study PDFs into a structured JSON schema. These prompts specified exact field names and enforced output constraints to maintain consistency and minimize hallucination across diverse formats and writing styles.
+
+    \item \textbf{Treatment Plan Generation:} We designed prompts to instruct LLMs to produce comprehensive treatment plans by explicitly considering the perspectives of each team member involved in a case. These prompts incorporated role-awareness cues and required a structured, sectioned response to simulate interprofessional reasoning within a single model.
+
+    \item \textbf{Multi-Agent Role Synthesis:} For our proposed MediSyn architecture, we created a specialized prompt to simulate a collaborative discussion among role-specific agents. The prompt instructed the LLM to synthesize previously generated responses from multiple agents into a single unified treatment plan, capturing key contributions while resolving redundancies or contradictions.
+
+    \item \textbf{LLM-as-a-Judge Evaluation:} To complement quantitative metrics, we used LLMs as evaluators of treatment plan quality. A prompt was crafted to ask an LLM to assess and score treatment plans on multiple qualitative dimensions—such as plausibility, specificity, and completeness—while remaining blind to which method generated the plan.
+\end{enumerate}
+
+These prompt designs enabled more controlled and context-sensitive outputs from the LLMs, facilitating both accurate data ingestion, high-quality generation, and robust evaluation. The complete prompt templates used in each of these stages are provided below.
+
+\subsubsection*{Prompts Used Across the Pipeline}
+
+\paragraph{1. Structured Data Extraction Prompts}
+
+\begin{tcolorbox}[mypromptbox, title={LLaMA 3.2 Prompt to extract structured JSON from case study PDF}]
 \begin{lstlisting}
 <|begin_of_text|>
 <|start_header_id|>system<|end_header_id|>
@@ -439,8 +464,68 @@ PDF CONTENT:
 \end{lstlisting}
 \end{tcolorbox}
 
+\begin{tcolorbox}[mypromptbox, title={Claude 3.5 Prompt to extract structured JSON from case study PDF}]
+\begin{lstlisting}
+System:
+You are a medical document processor. Extract ALL information into this EXACT JSON format:
+```json
+{
+  "patient_info": {
+    "name": "string", 
+    "age": "string",
+    "diagnosis": ["string"]
+  },
+  "summary": "Concise clinical summary",
+  "team_members": ["string"],
+  "background": "Medical history and key events",
+  "assessment_plan": "The assessment plan section including the individual team member assessments",
+  "assessment_results": "The assessment results section including the individual team member assessments results",
+  "treatment_plan": "The Treatment plan section including the individual team member's take on the treatment plan"
+}
 
-\begin{tcolorbox}[mypromptbox, title={Prompt used for Prompt-Tuned LLM Treatment Plan Generation}]
+RULES:
+1. Output ONLY valid JSON between ```json markers
+2. Use exact field names
+3. Never add comments
+4. Maintain original medical terms
+5. Be explanatory and don't summarize the information
+6. Do not include any text outside the JSON structure""",
+            "user": f"PDF CONTENT:\n{text_content}"
+  
+\end{lstlisting}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mypromptbox, title={GPT-4o Prompt to extract structured JSON from case study PDF}]
+\begin{lstlisting}
+You are a medical document processor. Extract ALL information into this EXACT format:
+     "name": "string", 
+     "age": "string",
+     "diagnosis": ["string"]
+     "summary": "Concise clinical summary",
+     "team_members": ["string"],
+     "background": "Medical history and key events",
+     "assessment_plan": "The assessment plan section including the individual team member assessments",
+     "assessment_results": "The assessment results section including the individual team member assessments results",
+     "treatment_plan": "The Treatment plan section including the individual team member's take on the treatment plan"
+
+RULES:
+1. Output ONLY Exact Format given 
+2. Use exact field names
+3. Never add comments
+4. Maintain original medical terms
+5. Be explanatory and don't summarize the information
+\end{lstlisting}
+\end{tcolorbox}
+
+\paragraph{2. Treatment Plan Generation Prompts}
+
+\begin{tcolorbox}[mypromptbox, title={Base Prompt}] 
+\begin{lstlisting}
+Generate a treatment plan.
+\end{lstlisting} 
+\end{tcolorbox}
+
+\begin{tcolorbox}[mypromptbox, title={Prompt-Tuned LLM Prompt}]
 \begin{lstlisting}
 **Required Output Format**
 Create a comprehensive treatment plan with specific recommendations from each team member's perspective.
@@ -452,7 +537,149 @@ Structure your response using EXACTLY these section headers:
 \end{lstlisting}
 \end{tcolorbox}
 
+
+\paragraph{3. MediSyn Prompts}
+
+\begin{tcolorbox}[mypromptbox, title={Prompt Generator Prompt}] 
+\begin{lstlisting}
+Generate a prompt for this role as a {}
+\end{lstlisting} 
+\end{tcolorbox}
+
+\begin{tcolorbox}[mypromptbox, title={Synthesis Agent Prompt}]
+\begin{lstlisting}
+As the synthesis agent, your task is to carefully analyze and integrate the recommendations provided by each role-specific healthcare agent involved in the current clinical case. Each agent's input represents their specialized professional perspective.
+
+Your goal is to synthesize these diverse insights into a cohesive, context-sensitive, and comprehensive treatment plan.
+
+Follow these guidelines strictly:
+
+1. Read all the individual recommendations thoroughly to understand each professional perspective.
+2. Identify areas of agreement, differences, or potential conflicts among the recommendations.
+3. Ensure that the final synthesized treatment plan respects the contributions from each professional perspective.
+4. Clearly outline specific, actionable recommendations under each team member's role.
+
+Use EXACTLY the following format for your final synthesized response:
+
+Required Output Format
+Create a comprehensive treatment plan with specific recommendations from each team member's perspective.
+
+Structure your response using EXACTLY these section headers:
+{team_member_roles}
+{For each team member}
+[Full Team Member Role Name]: [Recommendations]
+
+Ensure your synthesis is accurate, nuanced, and demonstrates an integrated inter-professional approach that aligns with Inter-Professional Education/Practice (IPE/IPP) principles.
+\end{lstlisting}
+\end{tcolorbox}
+
+
+\paragraph{4. Evaluation Prompt}
+
+\begin{tcolorbox}[mypromptbox, title={LLM-as-a-Judge Evaluation Prompt}]
+\begin{lstlisting}
+Evaluate on the basis of the following criteria:
+The diagnostic accuracy framework was categorized into the following components: 
+(1) Overall Accuracy 
+(2) Plausibility 
+(3) Specificity 
+(4) Omission / Uncertainty
+
+Accuracy represents how well it meets the definition of a diagnosis. 
+Plausibility evaluates whether the diagnosis is reasonable and free from hallucinations. 
+Specificity captures the level of detail (e.g., sepsis vs sepsis from influenza pneumonia). 
+Omission penalizes missing clinically important diagnoses. 
+Uncertainty (conditional on omission) penalizes failure to use available information.
+
+Score each axis independently and provide a brief justification for each.
+\end{lstlisting}
+\end{tcolorbox}
+
+
 \subsection{Data Preparation comparision - OpenAI vs Claude vs Llama}\label{subsec4.2}
+
+To evaluate how well different large language models (LLMs) perform at extracting structured information from unstructured medical case study PDFs, we compared outputs generated by three models—GPT-4o (OpenAI), Claude 3.5 Sonnet (Anthropic), and LLaMA 3.2 70B (Meta). Each model was tasked with converting a single narrative-style ASHA case study into a predefined JSON schema that included all relevant fields, such as \texttt{patient\_info}, \texttt{summary}, \texttt{team\_members}, \texttt{background}, \texttt{assessment\_plan}, \texttt{assessment\_results}, and \texttt{treatment\_plan}.
+
+To ensure fairness, we used the same prompt logic across all models, with formatting adjusted to suit each model’s input style. Outputs were then qualitatively evaluated through visual inspection. Rather than assigning quantitative scores, we focused on understanding whether each model captured the essential clinical information with enough fidelity to support downstream tasks like treatment plan generation. For example, even if a model paraphrased or shortened the original text, as long as it retained the key clinical facts, we considered the output usable.
+
+To make the differences more interpretable, we provide visual comparisons for a selected subset of fields—\texttt{patient\_info}, \texttt{background}, \texttt{summary}, \texttt{team\_members}, and \texttt{treatment\_plan}—omitting longer fields like \texttt{assessment\_plan} and \texttt{assessment\_results} for brevity. We will walk through one representative case study to illustrate our findings, noting that similar patterns were observed across the other case studies as well.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_patient_info.png}
+    \caption{\centering Comparison of \texttt{patient\_info} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
+    \label{fig:patient_info_comparison}
+\end{figure}
+
+The \texttt{patient\_info} field contains basic demographic and diagnostic details such as the patient’s name, age, and diagnosis. All three models successfully identified and extracted the patient's name as ``Elizabeth'' and represented the age as ``4-year-old,'' although Claude formatted it as ``4 year old'' (without hyphenation), and GPT preserved the format closest to the manual version.
+
+The most noticeable difference appeared in the \texttt{diagnosis} field. The manually curated JSON included only one diagnosis: \texttt{"22q11.2 deletion syndrome"}. GPT-4o reproduced this faithfully, whereas Claude and LLaMA included additional inferred conditions such as ``severe hypernasality,'' ``velopharyngeal disorder,'' and ``articulation disorder.'' While these additions are medically plausible and contextually relevant, they are not explicitly mentioned in the original text, making them mild hallucinations.
+
+Overall, GPT-4o most closely matched the manual version in both structure and content. Claude and LLaMA tended to be more verbose or inferential in their outputs, which may reflect an attempt to enrich the response but could introduce unintended interpretations if used in a strictly extractive setting.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_summary.png}
+    \caption{\centering Comparison of \texttt{summary} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
+    \label{fig:summary_comparison}
+\end{figure}
+
+The \texttt{summary} field is intended to provide a concise, high-level overview of the case study. Both the manually extracted summary and the outputs from GPT-4o and LLaMA aligned closely in structure and wording, reflecting near-verbatim extraction of the original narrative.
+
+Claude 3.5, however, restructured the sentence slightly, opting for a more natural and narrative-driven style. It preserved the core content but combined diagnosis and planned evaluation into a smoother, paraphrased form. While the meaning remained intact, the output lacked the more factual tone and field-oriented structure seen in the manual version.
+
+This contrast highlights a key difference in model behavior: while GPT-4o and LLaMA tend to extract text conservatively, Claude occasionally leans toward stylistic fluency, which could be beneficial for summarization tasks but may diverge from strict extraction goals.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_team_members.png}
+    \caption{\centering Comparison of \texttt{team\_members} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
+    \label{fig:team_members_comparison}
+\end{figure}
+
+The \texttt{team\_members} field lists the various professionals and individuals involved in the patient’s care team. The manually curated JSON included all ten members explicitly mentioned in the case study, including both clinical professionals (e.g., speech-language pathologist, geneticist) and non-clinical roles (e.g., patient, family).
+
+GPT-4o was the most faithful to the manual version, preserving the full list of team members without omissions. In contrast, both Claude and LLaMA excluded the ``Patient'' and ``Family'' roles from their outputs. This suggests that these models may be biased toward recognizing only formal clinical roles and may filter out perceived “non-professional” entries when summarizing or extracting data.
+
+While this filtering may not affect downstream treatment generation in most cases, it does reflect a subtle divergence in how different models interpret the definition of a “team” in an interprofessional context—particularly important in domains like IPE, where holistic and family-centered care is emphasized.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_background.png}
+    \caption{\centering Comparison of \texttt{background} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
+    \label{fig:background_comparison}
+\end{figure}
+
+The \texttt{background} field captures the patient’s clinical history and contextual information leading up to the current referral. All three LLMs extracted the key details from the source PDF with a high degree of fidelity, closely matching the manually curated version.
+
+GPT-4o and LLaMA followed the source phrasing quite literally, maintaining the sentence structure and terminology with minimal deviation. Claude 3.5 introduced a small stylistic change by paraphrasing part of the referral statement—transforming ``The patient was referred...'' into ``Evaluation was recommended...''—which slightly alters the tone but not the factual content.
+
+This field showed the most consistency across models, suggesting that straightforward narrative segments with minimal ambiguity are well-handled by all three LLMs when structured prompting is applied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_treatment_plan.png}
+    \caption{\centering Comparison of \texttt{treatment\_plan} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
+    \label{fig:treatment_plan_comparison}
+\end{figure}
+
+The \texttt{treatment\_plan} field represents the most complex and interpretive portion of the extracted data, as it aggregates recommendations from multiple interprofessional team members. The manually prepared version offers a clean breakdown with clearly delineated contributions from each role.
+
+GPT-4o generated a concise and reasonably structured plan, correctly identifying most team members and assigning plausible actions. However, its output was relatively short and omitted several role-specific recommendations found in the manual version.
+
+LLaMA and Claude 3.5 produced significantly longer and more detailed outputs. Both captured additional tasks, such as ``long-term hearing monitoring'' or ``referrals for social support,'' which were not explicitly stated in the case study but are contextually relevant. While this can add richness, it also introduces interpretive variability and potential hallucinations.
+
+Notably, both LLaMA and Claude reformatted the original structure into more prose-driven responses rather than following the explicit team-member formatting in the manual. This divergence highlights the models’ tendency to favor generative fluency over strict structural alignment when not explicitly instructed to follow a rigid schema.
+Overall, all three models successfully conveyed the core components of the treatment plan, but their outputs varied significantly in verbosity, structure, and interpretive scope.
+
+Across the five fields examined—\texttt{patient\_info}, \texttt{summary}, \texttt{team\_members}, \texttt{background}, and \texttt{treatment\_plan}—all three LLMs demonstrated the ability to extract structured information from unstructured clinical narratives with varying levels of fidelity. GPT-4o tended to preserve original phrasing and structure more faithfully, while Claude 3.5 and LLaMA 3.2 occasionally introduced additional content or reformatted outputs in more narrative styles. Although some outputs included minor hallucinations or omitted less obvious roles, the core medical context was retained in all cases.
+
+Ultimately, the qualitative differences observed across models were not significant enough to impact downstream performance in treatment plan generation. This supports our decision to use the LLM-specific extracted JSONs as valid input for subsequent evaluation stages, without the need for strict quantitative scoring or error correction.
+
+
+
+
 \subsection{Treatment Plans comparision - OpenAI vs Claude vs Llama}\label{subsec4.3}
 \subsubsection{Manually prepared data}\label{subsec4.3.1}
 \subsubsection{LLM prepared data}\label{subsec4.3.2}
