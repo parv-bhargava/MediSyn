@@ -394,10 +394,78 @@ We applied this prompt-tuned approach to all three LLMs under study—GPT-4o, Cl
 
 
 \subsection{MediSyn: A Synergistic multi-agent AI system for IPE}\label{subsec3.5}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/architecture.png}
+    \caption{\centering MediSyn Architecture}
+    \label{fig:architecture}
+\end{figure}
+
+To address the limitations of monolithic and prompt-tuned LLM approaches in replicating interprofessional collaboration, we propose \textbf{MediSyn}, a dynamic multi-agent system (MAS) designed explicitly for IPE case studies. MediSyn simulates a virtual care team by instantiating role-specific agents aligned with the professions identified in each case study. Unlike traditional MAS architectures with static agent roles, MediSyn dynamically configures agents based on case-specific team composition, enabling flexible adaptation to diverse healthcare scenarios.
+
+As illustrated in Figure~\ref{fig:architecture}, the system workflow begins with the \textit{Agent Builder}, which parses the input JSON (structured from real-world IPE case studies) to extract the list of healthcare roles involved. For each role, MediSyn invokes a \textit{Prompt Generator} module to construct a profession-specific prompt. These prompts encode domain knowledge, scope of practice, and context-specific responsibilities.
+
+Next, the \textit{Agent Instantiation} process launches individual agents, each constrained to reason within its domain. Each agent independently reviews the shared patient case and generates a treatment recommendation from its professional perspective using its respective prompt and an LLM backend. This step mirrors real-world interprofessional dynamics where specialists offer distinct but complementary contributions.
+
+Following the agent-level reasoning, MediSyn activates a \textit{Synthesis Agent}, responsible for integrating the diverse role-specific outputs. The synthesis prompt instructs the agent to consolidate these recommendations into a coherent, role-attributed treatment plan that preserves professional distinctions while resolving overlaps or inconsistencies. The resulting plan is presented in a standardized format with clearly labeled contributions from each team member, aligning with IPE/IPP documentation standards.
+
+Importantly, MediSyn is model-agnostic. The system’s modular architecture allows experimentation with different LLM backends—GPT-4o, Claude 3.5, or LLaMA 3.2—at both the agent and synthesis levels. This design facilitates fine-grained benchmarking of agent-level and system-level performance across models.
+
+In sum, MediSyn provides a scalable framework for simulating interprofessional reasoning in healthcare. It combines role-driven specialization with collaborative synthesis, offering a closer approximation of real-world IPE practice than existing single-model or prompt-tuned approaches. The system thus serves as both a research platform and a pedagogical tool for evaluating and enhancing AI support for interprofessional collaboration in clinical settings.
+
 \subsection{Evaluation Methods}\label{subsec3.6}
+
+To rigorously compare the performance of the baseline and proposed treatment generation pipelines, we employed a blend of quantitative and qualitative evaluation strategies. Specifically, we evaluated each system—Single LLM, Prompt-Tuned LLM, and MediSyn—using two established automated metrics from the field of natural language generation (BLEU and ROUGE), as well as a qualitative assessment via an ``LLM-as-a-Judge'' approach. This multi-faceted evaluation design allows us to triangulate both linguistic fidelity and clinical plausibility across methods.
+
 \subsubsection{BLEU Score}\label{subsec3.6.1}
+
+The Bilingual Evaluation Understudy (BLEU) score is a widely adopted metric for assessing the overlap between a candidate sequence and one or more reference sequences. Originally developed for machine translation, BLEU has since found utility in various generation tasks, including clinical text generation.
+
+In our setup, we compute BLEU scores to evaluate how closely the generated treatment plans match the manually extracted reference plans. We consider unigram to 4-gram overlaps to balance both local and extended phrasal fidelity. The BLEU score is formally computed as:
+
+\begin{equation}
+\text{BLEU} = \text{BP} \cdot \exp\left( \sum_{n=1}^{N} w_n \log p_n \right)
+\end{equation}
+
+where \( p_n \) denotes the precision of \( n \)-grams, \( w_n \) are weights (commonly uniform: \( w_n = \frac{1}{N} \)), and \( \text{BP} \) is the brevity penalty defined as:
+
+\begin{equation}
+\text{BP} =
+\begin{cases}
+1 & \text{if } c > r \\
+\exp(1 - \frac{r}{c}) & \text{if } c \leq r
+\end{cases}
+\end{equation}
+
+Here, \( c \) is the length of the candidate output and \( r \) is the length of the reference.
+
 \subsubsection{ROUGE Score}\label{subsec3.6.2}
+
+The Recall-Oriented Understudy for Gisting Evaluation (ROUGE) score is another cornerstone metric for evaluating text generation, particularly useful for summarization and structured synthesis tasks. Unlike BLEU, which emphasizes precision, ROUGE prioritizes recall, making it well-suited for capturing completeness in medical plans.
+
+We focus on ROUGE-N (with \( N=1,2 \)) and ROUGE-L (Longest Common Subsequence) in our evaluations. The ROUGE-N score is calculated as:
+
+\begin{equation}
+\text{ROUGE-N} = \frac{\sum_{\text{ref} \in \text{References}} \sum_{\text{gram}_n \in \text{ref}} \text{Count}_{\text{match}}(\text{gram}_n)}{\sum_{\text{ref} \in \text{References}} \sum_{\text{gram}_n \in \text{ref}} \text{Count}(\text{gram}_n)}
+\end{equation}
+
+where \( \text{Count}_{\text{match}} \) refers to the number of overlapping n-grams between the candidate and reference, and \( \text{Count} \) is the total number of n-grams in the reference.
+
 \subsubsection{LLM as a Judge}\label{subsec3.6.3}
+
+Beyond surface-level similarity, we incorporated a qualitative evaluation framework by prompting LLMs to act as domain-aware evaluators of generated treatment plans. This method, inspired by recent works in LLM-based benchmarking, allows us to assess the outputs across multiple clinical axes—namely plausibility, specificity, accuracy, and omission.
+
+Each plan is blindly reviewed by an LLM, which is instructed to rate it on a 1–5 scale for each of the following criteria:
+
+\begin{itemize}
+    \item \textbf{Accuracy}: Correctness and clinical relevance of recommendations.
+    \item \textbf{Plausibility}: Whether the recommendations are medically sound and free from hallucinations.
+    \item \textbf{Specificity}: Degree of detail provided (e.g., “hearing screening” vs. “bilateral tympanometry screening with follow-up”).
+    \item \textbf{Omission}: Penalization for missing crucial clinical actions or roles.
+\end{itemize}
+
+These scores enable a more nuanced understanding of how well each generation strategy supports real-world interprofessional collaboration in healthcare contexts.
 
 
 \section{Experiments and Results}\label{sec4}
