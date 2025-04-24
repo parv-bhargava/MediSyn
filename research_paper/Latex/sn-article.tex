@@ -272,7 +272,7 @@ The above diagram is a view of some of the elements in one particular case study
 To understand the features better, here's a snapshot of the raw data:
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{Fig/data3.png}
+    \includegraphics[width=0.8\textwidth]{Fig/data3.pdf}
     \caption{\centering Data Features}
     \label{fig:Case study (Features)}
 \end{figure}
@@ -532,58 +532,10 @@ PDF CONTENT:
 \end{lstlisting}
 \end{tcolorbox}
 
-\begin{tcolorbox}[mypromptbox, title={Claude 3.5 Prompt to extract structured JSON from case study PDF}]
-\begin{lstlisting}
-System:
-You are a medical document processor. Extract ALL information into this EXACT JSON format:
-```json
-{
-  "patient_info": {
-    "name": "string", 
-    "age": "string",
-    "diagnosis": ["string"]
-  },
-  "summary": "Concise clinical summary",
-  "team_members": ["string"],
-  "background": "Medical history and key events",
-  "assessment_plan": "The assessment plan section including the individual team member assessments",
-  "assessment_results": "The assessment results section including the individual team member assessments results",
-  "treatment_plan": "The Treatment plan section including the individual team member's take on the treatment plan"
-}
+\noindent
+The Claude 3.5 and GPT-4o prompts for structured data extraction follow the same logical structure as the LLaMA 3.2 prompt shown above, with only minor differences in formatting to suit their respective input conventions (e.g., system-user messages for Claude, inline instruction blocks for GPT). For completeness, these model-specific prompt variations are provided in Appendix~\ref{secA1}.
 
-RULES:
-1. Output ONLY valid JSON between ```json markers
-2. Use exact field names
-3. Never add comments
-4. Maintain original medical terms
-5. Be explanatory and don't summarize the information
-6. Do not include any text outside the JSON structure""",
-            "user": f"PDF CONTENT:\n{text_content}"
-  
-\end{lstlisting}
-\end{tcolorbox}
 
-\begin{tcolorbox}[mypromptbox, title={GPT-4o Prompt to extract structured JSON from case study PDF}]
-\begin{lstlisting}
-You are a medical document processor. Extract ALL information into this EXACT format:
-     "name": "string", 
-     "age": "string",
-     "diagnosis": ["string"]
-     "summary": "Concise clinical summary",
-     "team_members": ["string"],
-     "background": "Medical history and key events",
-     "assessment_plan": "The assessment plan section including the individual team member assessments",
-     "assessment_results": "The assessment results section including the individual team member assessments results",
-     "treatment_plan": "The Treatment plan section including the individual team member's take on the treatment plan"
-
-RULES:
-1. Output ONLY Exact Format given 
-2. Use exact field names
-3. Never add comments
-4. Maintain original medical terms
-5. Be explanatory and don't summarize the information
-\end{lstlisting}
-\end{tcolorbox}
 
 \paragraph{2. Treatment Plan Generation Prompts}
 
@@ -670,12 +622,12 @@ To evaluate how well different large language models (LLMs) perform at extractin
 
 To ensure fairness, we used the same prompt logic across all models, with formatting adjusted to suit each model’s input style. Outputs were then qualitatively evaluated through visual inspection. Rather than assigning quantitative scores, we focused on understanding whether each model captured the essential clinical information with enough fidelity to support downstream tasks like treatment plan generation. For example, even if a model paraphrased or shortened the original text, as long as it retained the key clinical facts, we considered the output usable.
 
-To make the differences more interpretable, we provide visual comparisons for a selected subset of fields—\texttt{patient\_info}, \texttt{background}, \texttt{summary}, \texttt{team\_members}, and \texttt{treatment\_plan}—omitting longer fields like \texttt{assessment\_plan} and \texttt{assessment\_results} for brevity. We will walk through one representative case study to illustrate our findings, noting that similar patterns were observed across the other case studies as well.
+To make the differences more interpretable, we provide visual comparisons for a selected subset of fields—\texttt{patient\_info}, \texttt{background}, \texttt{summary}, \texttt{team\_members}, and \texttt{treatment\_plan}—omitting longer fields like \texttt{assessment\_plan} and \texttt{assessment\_results} for brevity. We will walk through one representative case study to illustrate our findings, noting that similar patterns were observed across the other case studies as well. For brevity, we present the comparisons for \texttt{patient\_info}, \texttt{summary}, and \texttt{treatment\_plan} in the main paper. Additional examples for \texttt{team\_members} and \texttt{background} are provided in Appendix~\ref{secA2}.
 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_patient_info.png}
+    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_patient_info.pdf}
     \caption{\centering Comparison of \texttt{patient\_info} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
     \label{fig:patient_info_comparison}
 \end{figure}
@@ -688,7 +640,7 @@ Overall, GPT-4o most closely matched the manual version in both structure and co
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_summary.png}
+    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_summary.pdf}
     \caption{\centering Comparison of \texttt{summary} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
     \label{fig:summary_comparison}
 \end{figure}
@@ -699,35 +651,10 @@ Claude 3.5, however, restructured the sentence slightly, opting for a more natur
 
 This contrast highlights a key difference in model behavior: while GPT-4o and LLaMA tend to extract text conservatively, Claude occasionally leans toward stylistic fluency, which could be beneficial for summarization tasks but may diverge from strict extraction goals.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_team_members.png}
-    \caption{\centering Comparison of \texttt{team\_members} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
-    \label{fig:team_members_comparison}
-\end{figure}
-
-The \texttt{team\_members} field lists the various professionals and individuals involved in the patient’s care team. The manually curated JSON included all ten members explicitly mentioned in the case study, including both clinical professionals (e.g., speech-language pathologist, geneticist) and non-clinical roles (e.g., patient, family).
-
-GPT-4o was the most faithful to the manual version, preserving the full list of team members without omissions. In contrast, both Claude and LLaMA excluded the ``Patient'' and ``Family'' roles from their outputs. This suggests that these models may be biased toward recognizing only formal clinical roles and may filter out perceived “non-professional” entries when summarizing or extracting data.
-
-While this filtering may not affect downstream treatment generation in most cases, it does reflect a subtle divergence in how different models interpret the definition of a “team” in an interprofessional context—particularly important in domains like IPE, where holistic and family-centered care is emphasized.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_background.png}
-    \caption{\centering Comparison of \texttt{background} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
-    \label{fig:background_comparison}
-\end{figure}
-
-The \texttt{background} field captures the patient’s clinical history and contextual information leading up to the current referral. All three LLMs extracted the key details from the source PDF with a high degree of fidelity, closely matching the manually curated version.
-
-GPT-4o and LLaMA followed the source phrasing quite literally, maintaining the sentence structure and terminology with minimal deviation. Claude 3.5 introduced a small stylistic change by paraphrasing part of the referral statement—transforming ``The patient was referred...'' into ``Evaluation was recommended...''—which slightly alters the tone but not the factual content.
-
-This field showed the most consistency across models, suggesting that straightforward narrative segments with minimal ambiguity are well-handled by all three LLMs when structured prompting is applied.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_treatment_plan.png}
+    \includegraphics[width=1.0\textwidth]{Fig/Dataprep_treatment_plan.pdf}
     \caption{\centering Comparison of \texttt{treatment\_plan} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2}
     \label{fig:treatment_plan_comparison}
 \end{figure}
@@ -1027,9 +954,62 @@ BMC journals: \url{https://www.biomedcentral.com/getpublished/editorial-policies
 
 \begin{appendices}
 
-\section{Section title of first appendix}\label{secA1}
+\section{Supplementary Prompts}\label{secA1}
 
-An appendix contains supplementary information that is not an essential part of the text itself but which may be helpful in providing a more comprehensive understanding of the research problem or it is information that is too cumbersome to be included in the body of the paper.
+
+\begin{tcolorbox}[mypromptbox, title={Claude 3.5 Prompt to extract structured JSON from case study PDF}]
+\begin{lstlisting}
+System:
+You are a medical document processor. Extract ALL information into this EXACT JSON format:
+```json
+{
+  "patient_info": {
+    "name": "string", 
+    "age": "string",
+    "diagnosis": ["string"]
+  },
+  "summary": "Concise clinical summary",
+  "team_members": ["string"],
+  "background": "Medical history and key events",
+  "assessment_plan": "The assessment plan section including the individual team member assessments",
+  "assessment_results": "The assessment results section including the individual team member assessments results",
+  "treatment_plan": "The Treatment plan section including the individual team member's take on the treatment plan"
+}
+
+RULES:
+1. Output ONLY valid JSON between ```json markers
+2. Use exact field names
+3. Never add comments
+4. Maintain original medical terms
+5. Be explanatory and don't summarize the information
+6. Do not include any text outside the JSON structure""",
+            "user": f"PDF CONTENT:\n{text_content}"
+  
+\end{lstlisting}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mypromptbox, title={GPT-4o Prompt to extract structured JSON from case study PDF}]
+\begin{lstlisting}
+You are a medical document processor. Extract ALL information into this EXACT format:
+     "name": "string", 
+     "age": "string",
+     "diagnosis": ["string"]
+     "summary": "Concise clinical summary",
+     "team_members": ["string"],
+     "background": "Medical history and key events",
+     "assessment_plan": "The assessment plan section including the individual team member assessments",
+     "assessment_results": "The assessment results section including the individual team member assessments results",
+     "treatment_plan": "The Treatment plan section including the individual team member's take on the treatment plan"
+
+RULES:
+1. Output ONLY Exact Format given 
+2. Use exact field names
+3. Never add comments
+4. Maintain original medical terms
+5. Be explanatory and don't summarize the information
+\end{lstlisting}
+\end{tcolorbox}
+
 
 %%=============================================%%
 %% For submissions to Nature Portfolio Journals %%
@@ -1040,7 +1020,22 @@ An appendix contains supplementary information that is not an essential part of 
 %% Sample for another appendix section			       %%
 %%=============================================================%%
 
-%% \section{Example of another appendix section}\label{secA2}%
+\section{Supplementary Data Preparation Figures}\label{secA2}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Fig/Dataprep_team_members.pdf}
+    \caption{\centering Comparison of \texttt{team\_members} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2. GPT-4o was the most faithful to the manual version, preserving the full list of team members without omissions. In contrast, both Claude and LLaMA excluded the ``Patient'' and ``Family'' roles from their outputs.}
+    \label{fig:team_members_comparison}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Fig/Dataprep_background.pdf}
+    \caption{\centering Comparison of \texttt{background} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2. GPT-4o and LLaMA followed the source phrasing quite literally, with minimal deviation. Claude 3.5 introduced a small stylistic change by paraphrasing part of the referral statement—transforming ``The patient was referred...'' into ``Evaluation was recommended...''}
+    \label{fig:background_comparison}
+\end{figure}
+
+
 %% Appendices may be used for helpful, supporting or essential material that would otherwise 
 %% clutter, break up or be distracting to the text. Appendices can consist of sections, figures, 
 %% tables and equations etc.
