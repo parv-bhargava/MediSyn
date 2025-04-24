@@ -60,6 +60,8 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{float}
+\usepackage{subcaption}
+
 
 \lstdefinelanguage{json}{
     basicstyle=\ttfamily\footnotesize,
@@ -689,83 +691,15 @@ We begin with results from LLaMA 3.2, followed by Claude 3.5 Sonnet and GPT-4o.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Llama_base_treatment_plan_manual.png}
-    \caption{\centering LLaMA 3.2 Base: Treatment plan generated using a single general-purpose prompt.}
-    \label{fig:llama_base_treatment}
+    \includegraphics[width=0.9\textwidth]{Fig/MediSyn_treatment_plan_manual.pdf}
+    \caption{\centering MediSyn: Treatment plan synthesized by agent-based role-specific contributions from manually prepared data.}
+    \label{fig:llm_medisyn_treatment_manual}
 \end{figure}
 
-The base LLaMA output produces a long, densely packed treatment plan organized loosely into clinical themes like speech therapy, surgical intervention, and genetic testing. While the content is medically rich and covers a wide range of relevant interventions, it lacks any explicit attribution to team member roles. The structure is somewhat inconsistent, with repeated headings and limited formatting, making it less aligned with interprofessional education and practice (IPE/IPP) standards. Additionally, the verbosity and lack of separation between short-term and long-term goals may hinder clarity for end-users.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Llama_prompt-tuned_treatment_plan_manual.png}
-    \caption{\centering LLaMA 3.2 Prompt-Tuned: Treatment plan generated using role-aware prompt engineering.}
-    \label{fig:llama_prompt_tuned_treatment}
-\end{figure}
+The LLama MediSyn output presents the most professional and polished plan. It organizes content into discipline-based sections (e.g., Speech-Language Therapy, Genetic Counseling) using a hierarchical structure with goals and interventions. While it does not explicitly name individual agents or team members, the sections correspond to their domains, preserving the spirit of role-aware collaboration. This structure mirrors actual clinical documentation practices and offers the best balance between readability, depth, and IPE relevance.
 
-The prompt-tuned version introduces structured outputs with explicit attribution to each team member, such as the social worker, ENT, or geneticist. This format improves both readability and interprofessional relevance, ensuring that each contributor's perspective is acknowledged. The recommendations are tailored to respective roles and include both medical interventions and psychosocial support. While the verbosity remains relatively high, the clarity of structure and alignment with IPE values is a marked improvement over the base version.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Llama_MediSyn_treatment_plan_manual.png}
-    \caption{\centering LLaMA 3.2 MediSyn: Treatment plan synthesized from agent-based role-specific contributions.}
-    \label{fig:llama_medisyn_treatment}
-\end{figure}
-
-The MediSyn output presents the most professional and polished plan. It organizes content into discipline-based sections (e.g., Speech-Language Therapy, Genetic Counseling) using a hierarchical structure with goals and interventions. While it does not explicitly name individual agents or team members, the sections correspond to their domains, preserving the spirit of role-aware collaboration. This structure mirrors actual clinical documentation practices and offers the best balance between readability, depth, and IPE relevance.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Claude_base_treatment_plan_manual.png}
-    \caption{\centering Claude 3.5 Base: Treatment plan generated using a single general-purpose prompt.}
-    \label{fig:claude_base_treatment}
-\end{figure}
-
-The base output from Claude 3.5 is comprehensive and neatly structured into thematic sections such as genetic counseling, speech therapy, surgical intervention, medical management, and parent education. Each domain includes multiple actionable items, showing the model’s capacity for depth. However, while the plan is well organized, it lacks explicit attribution to individual team members, and the structure leans toward topical groupings rather than interprofessional communication. Overall, it reads like a unified clinical note rather than a collaborative synthesis.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Claude_prompt-tuned_treatment_plan_manual.png}
-    \caption{\centering Claude 3.5 Prompt-Tuned: Treatment plan generated using role-aware prompt engineering.}
-    \label{fig:claude_prompt_tuned_treatment}
-\end{figure}
-
-The prompt-tuned version provides a major improvement in interprofessional clarity. Each team member’s contributions are clearly labeled—ranging from geneticist to social worker—and the recommendations are individualized. The language is collaborative and holistic, capturing both medical and psychosocial aspects of care. This version excels in maintaining the structure and formatting implied by the prompt, making it more readable and team-aware. Some redundancy is present, but overall, the prompt-tuned model performs well in balancing fluency with structure.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Claude_MediSyn_treatment_plan_manual.png}
-    \caption{\centering Claude 3.5 MediSyn: Treatment plan synthesized from agent-based role-specific contributions.}
-    \label{fig:claude_medisyn_treatment}
-\end{figure}
-
-The MediSyn output closely mirrors the prompt-tuned version in content and format but appears even more cohesive. The structure is preserved nearly identically, with slight improvements in transitions and alignment across roles. This version demonstrates that Claude 3.5 handles agent-based role synthesis very effectively, integrating diverse agent outputs into a unified narrative. The result reads like a polished interprofessional plan, showing that the MediSyn architecture complements Claude’s strengths in clarity and formatting.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/GPT_base_treatment_plan_manual.png}
-    \caption{\centering GPT-4o Base: Treatment plan generated using a single general-purpose prompt.}
-    \label{fig:gpt_base_treatment}
-\end{figure}
-
-The base GPT-4o output is concise and clearly structured using bullet points and sections like “Goals”, “Procedures”, “Objectives”, and role headings. It touches on most core elements of the case—including speech therapy, ENT monitoring, and genetic counseling—but the content feels slightly abbreviated compared to Claude and LLaMA. There is limited elaboration within each section, and although role names appear (e.g., ENT, psychologist), they are inconsistently applied. The result is readable and moderately structured but lacks the richness and interprofessional clarity required in more comprehensive plans.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/GPT_prompt-tuned_treatment_plan_manual.png}
-    \caption{\centering GPT-4o Prompt-Tuned: Treatment plan generated using role-aware prompt engineering.}
-    \label{fig:gpt_prompt_tuned_treatment}
-\end{figure}
-
-The prompt-tuned version shows a clear improvement. Each team member is explicitly named, and the content is more detailed and discipline-specific. GPT-4o responds well to the structured prompt, producing well-separated sections and actionable insights tied to each role. Compared to Claude and LLaMA, however, the output is slightly more compact and at times omits nuanced elaboration. Still, the alignment with the prompt format and increased interprofessional relevance mark this as a significant step forward from the base configuration.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/GPT_MediSyn_treatment_plan_manual.png}
-    \caption{\centering GPT-4o MediSyn: Treatment plan synthesized from agent-based role-specific contributions.}
-    \label{fig:gpt_medisyn_treatment}
-\end{figure}
+The Claude MediSyn output closely mirrors the prompt-tuned version in content and format but appears even more cohesive. The structure is preserved nearly identically, with slight improvements in transitions and alignment across roles. This version demonstrates that Claude 3.5 handles agent-based role synthesis very effectively, integrating diverse agent outputs into a unified narrative. The result reads like a polished interprofessional plan, showing that the MediSyn architecture complements Claude’s strengths in clarity and formatting.
 
 The MediSyn output from GPT-4o is well-structured, detailed, and clearly aligned with IPE principles. Each recommendation is grouped under team roles, and the language reflects collaborative planning and practical interventions. Compared to the prompt-tuned version, the MediSyn output appears more polished, both in tone and formatting. The addition of “Overall Coordination and Follow-Up” as a final section is a valuable touch, signaling awareness of care continuity. This output demonstrates that GPT-4o benefits from the MediSyn framework, producing one of its most comprehensive and context-sensitive plans.
 
@@ -782,93 +716,18 @@ In this section, we replicate the previous treatment plan comparison pipeline, b
 
 Our goal here is to understand how the quality and fidelity of upstream data extraction impacts the performance of downstream generation. We again compare the base, prompt-tuned, and MediSyn configurations for each model—LLaMA 3.2, Claude 3.5 Sonnet, and GPT-4o—while focusing on structure, accuracy, interprofessional clarity, and consistency with the case context.
 
-
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Llama_base_treatment_plan_llm.png}
-    \caption{\centering LLaMA 3.2 Base: Treatment plan generated from LLaMA-extracted data using a general-purpose prompt.}
-    \label{fig:llama_base_llm}
-\end{figure}
-
-The base output generated using LLaMA’s own extracted JSON shows moderate consistency with the expected structure, and covers core domains such as speech therapy, surgery, audiological monitoring, and family education. However, compared to its manually-prepared counterpart, this version is more repetitive and exhibits a slightly disjointed progression between sections. Although it ends with an attempt to delineate roles, the transition is abrupt and suggests overlap between role descriptions and previously stated goals. This degradation in formatting may stem from minor inaccuracies in the upstream JSON extraction, particularly around section boundaries and role attribution.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Llama_prompt-tuned_treatment_plan_llm.png}
-    \caption{\centering LLaMA 3.2 Prompt-Tuned: Treatment plan using LLaMA-extracted data with role-aware prompt.}
-    \label{fig:llama_prompt_tuned_llm}
-\end{figure}
-
-The prompt-tuned version demonstrates improved organization and significantly better role segmentation. Each team member is explicitly labeled, and the recommendations are tailored, consistent, and medically grounded. Despite this, the quality is still slightly lower than in the manually-prepared version. Some sections are dense, and there are occasional shifts in phrasing that imply content repetition. These limitations likely originate from imperfections in the extracted input—such as over- or under-specification of certain role responsibilities—yet the prompt-tuned structure mitigates these effects well.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Llama_MediSyn_treatment_plan_llm.png}
-    \caption{\centering LLaMA 3.2 MediSyn: Treatment plan synthesized from LLaMA-generated agent inputs.}
+    \includegraphics[width=0.9\textwidth]{Fig/MediSyn_treatment_plan_llm.pdf}
+    \caption{\centering MediSyn: Treatment plan synthesized by agent-based role-specific contributions from LLM prepared data.}
     \label{fig:llama_medisyn_llm}
 \end{figure}
 
-The MediSyn version offers the most structured and comprehensive result among the three. Each profession’s perspective is clearly presented, and the synthesized plan effectively integrates clinical, behavioral, and psychosocial recommendations. Although a few sentences appear over-elaborated, the MediSyn architecture successfully abstracts away inconsistencies in the upstream data. The language is fluid and cohesive, and the content mirrors real-world clinical documentation. Compared to its manually-fed counterpart, this output performs slightly better in maintaining formatting and flow, suggesting that MediSyn provides greater resilience to noisy or imperfect input data.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Claude_base_treatment_plan_llm.png}
-    \caption{\centering Claude 3.5 Base: Treatment plan generated using Claude’s own extracted data and a general-purpose prompt.}
-    \label{fig:claude_base_llm}
-\end{figure}
-
-The base Claude output begins with a pseudo-diagnostic summary before transitioning into the treatment plan, blending structured care points with explanatory narrative. While the plan covers relevant medical and psychosocial domains—including speech therapy, surgery, education, and long-term follow-up—it lacks clear segmentation by professional roles. This impairs the readability and makes it difficult to trace recommendations to specific providers. These issues likely stem from the semi-structured nature of Claude’s extracted JSON, where certain headings and transitions were ambiguously parsed or omitted.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Claude_prompt-tuned_treatment_plan_llm.png}
-    \caption{\centering Claude 3.5 Prompt-Tuned: Role-aware plan generated from Claude-prepared input.}
-    \label{fig:claude_prompt_tuned_llm}
-\end{figure}
-
-The prompt-tuned version exhibits significant improvements in structure and clarity. Each professional is clearly labeled, and their respective contributions are appropriately detailed and medically plausible. Compared to the base version, this output features improved alignment with IPE principles and fewer digressions into redundant or ambiguous phrasing. While there is some mild verbosity, it enhances comprehensiveness rather than cluttering the narrative. The consistency in tone and scope suggests that Claude’s extraction pipeline, when paired with a role-aware prompt, can produce high-quality outputs despite upstream noise.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/Claude_MediSyn_treatment_plan_llm.png}
-    \caption{\centering Claude 3.5 MediSyn: Synthesized treatment plan from Claude-based agent outputs.}
-    \label{fig:claude_medisyn_llm}
-\end{figure}
+The Llama MediSyn version offers the most structured and comprehensive result among the three. Each profession’s perspective is clearly presented, and the synthesized plan effectively integrates clinical, behavioral, and psychosocial recommendations. Although a few sentences appear over-elaborated, the MediSyn architecture successfully abstracts away inconsistencies in the upstream data. The language is fluid and cohesive, and the content mirrors real-world clinical documentation. Compared to its manually-fed counterpart, this output performs slightly better in maintaining formatting and flow, suggesting that MediSyn provides greater resilience to noisy or imperfect input data.
 
 The MediSyn treatment plan from Claude is well-structured, granular, and impressively comprehensive. Each team member’s recommendation is articulated with actionable strategies, domain-specific terminology, and interprofessional integration. Compared to the manually fed version, this output contains more detail and exhibits tighter alignment with collaborative workflows, likely due to the synthesis agent’s ability to filter and unify overlapping or redundant agent responses. Some sections, such as care coordination and educational planning, are particularly well-developed, showing Claude’s strength in combining both clinical and contextual reasoning when structured appropriately.
 
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/GPT_base_treatment_plan_llm.png}
-    \caption{\centering Treatment plan generated by GPT-4o using the base LLM approach with GPT-prepared data.}
-    \label{fig:gpt_base_llm_data}
-\end{figure}
-
-The base GPT-4o output is fairly structured and spans a broad range of domains—speech-language therapy, surgery, family education, behavioral monitoring, and more. The model adheres to a clear format with bolded section headings like \textbf{Objectives}, \textbf{Interventions}, and \textbf{Monitoring and Evaluation}, reflecting a semi-formal clinical style.
-
-While the output captures many correct clinical details, it leans heavily on general phrasing and lacks the profession-specific granularity that would be expected in a true interprofessional setting. Many recommendations are plausible, but vague—such as “support behavioral development” or “monitor progress”—which may reflect a limitation in how GPT interprets the more generic context provided by the auto-generated JSON. Compared to the manual-data results, this plan includes slightly less depth, but still maintains overall coherence and coverage.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/GPT_prompt-tuned_treatment_plan_llm.png}
-    \caption{\centering Treatment plan generated by GPT-4o using the prompt-tuned approach with GPT-prepared data.}
-    \label{fig:gpt_prompt_tuned_llm_data}
-\end{figure}
-
-The prompt-tuned variant significantly improves role delineation. Each recommendation is clearly attributed to a specific team member (e.g., \textbf{ENT}, \textbf{Geneticist}, \textbf{SLP}, etc.), resulting in higher specificity and profession-aware responses. For instance, the audiologist's section covers hearing screenings and guidance to parents, while the geneticist focuses on syndrome education and counseling—both appropriate and contextually accurate.
-
-Despite using auto-generated structured data, the model delivers impressively contextualized outputs, likely benefiting from the instruction-rich prompt. The formatting is also clearer, and the content is better segmented. However, some redundancy is present between roles, and the explanations are less clinically rich than in the manual-data version. Still, this is a strong output overall, and clearly benefits from prompt tuning.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Fig/GPT_MediSyn_treatment_plan_llm.png}
-    \caption{\centering Treatment plan generated by GPT-4o using the MediSyn multi-agent architecture with GPT-prepared data.}
-    \label{fig:gpt_medisyn_llm_data}
-\end{figure}
-
-The MediSyn output again follows a team-specific structure, but with even greater interprofessional depth. It introduces less common roles such as \textbf{Care Coordinator} and \textbf{Educational Specialist}, signaling the system's ability to reason beyond the immediate JSON input and simulate a full collaborative environment.
+The GPT MediSyn output again follows a team-specific structure, but with even greater interprofessional depth. It introduces less common roles such as \textbf{Care Coordinator} and \textbf{Educational Specialist}, signaling the system's ability to reason beyond the immediate JSON input and simulate a full collaborative environment.
 
 Recommendations are often more detailed than in the base or prompt-tuned versions, and show better integration across roles. For example, the \textbf{SLP} section mentions home-based practice and resonance correction, while the \textbf{ENT} and \textbf{Audiologist} jointly focus on managing ear infections and tympanometry. The \textbf{Social Worker} role is also well-developed, covering transportation and financial barriers—an important IPP element often omitted in standard outputs.
 
@@ -1024,16 +883,137 @@ RULES:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{Fig/Dataprep_team_members.pdf}
-    \caption{\centering Comparison of \texttt{team\_members} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2. GPT-4o was the most faithful to the manual version, preserving the full list of team members without omissions. In contrast, both Claude and LLaMA excluded the ``Patient'' and ``Family'' roles from their outputs.}
-    \label{fig:team_members_comparison}
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/Dataprep_team_members.pdf}
+        \caption{\texttt{team\_members} field comparison: GPT-4o preserved the full list, while Claude and LLaMA excluded “Patient” and “Family”.}
+        \label{fig:team_members_comparison}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/Dataprep_background.pdf}
+        \caption{\texttt{background} field comparison: GPT-4o and LLaMA used literal phrasing; Claude paraphrased ``The patient was referred'' into ``Evaluation was recommended''.}
+        \label{fig:background_comparison}
+    \end{subfigure}
+    \caption{\centering Comparison of fields across manual, GPT-4o, Claude 3.5, and LLaMA 3.2.}
+    \label{fig:data_prep_fields_comparison}
 \end{figure}
+
+
+\section{Supplementary Treatment Plan Figures}\label{secA2}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{Fig/Dataprep_background.pdf}
-    \caption{\centering Comparison of \texttt{background} field across manual, GPT-4o, Claude 3.5, and LLaMA 3.2. GPT-4o and LLaMA followed the source phrasing quite literally, with minimal deviation. Claude 3.5 introduced a small stylistic change by paraphrasing part of the referral statement—transforming ``The patient was referred...'' into ``Evaluation was recommended...''}
-    \label{fig:background_comparison}
+    \includegraphics[width=1.0\textwidth]{Fig/Llama_base_treatment_plan_manual.png}
+    \caption{\centering LLaMA 3.2 Base: Treatment plan generated using a single general-purpose prompt.}
+    \label{fig:llama_base_treatment}
 \end{figure}
+
+The base LLaMA output produces a long, densely packed treatment plan organized loosely into clinical themes like speech therapy, surgical intervention, and genetic testing. While the content is medically rich and covers a wide range of relevant interventions, it lacks any explicit attribution to team member roles. The structure is somewhat inconsistent, with repeated headings and limited formatting, making it less aligned with interprofessional education and practice (IPE/IPP) standards. Additionally, the verbosity and lack of separation between short-term and long-term goals may hinder clarity for end-users.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Llama_prompt-tuned_treatment_plan_manual.png}
+    \caption{\centering LLaMA 3.2 Prompt-Tuned: Treatment plan generated using role-aware prompt engineering.}
+    \label{fig:llama_prompt_tuned_treatment}
+\end{figure}
+
+The prompt-tuned version introduces structured outputs with explicit attribution to each team member, such as the social worker, ENT, or geneticist. This format improves both readability and interprofessional relevance, ensuring that each contributor's perspective is acknowledged. The recommendations are tailored to respective roles and include both medical interventions and psychosocial support. While the verbosity remains relatively high, the clarity of structure and alignment with IPE values is a marked improvement over the base version.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Claude_base_treatment_plan_manual.png}
+    \caption{\centering Claude 3.5 Base: Treatment plan generated using a single general-purpose prompt.}
+    \label{fig:claude_base_treatment}
+\end{figure}
+
+The base output from Claude 3.5 is comprehensive and neatly structured into thematic sections such as genetic counseling, speech therapy, surgical intervention, medical management, and parent education. Each domain includes multiple actionable items, showing the model’s capacity for depth. However, while the plan is well organized, it lacks explicit attribution to individual team members, and the structure leans toward topical groupings rather than interprofessional communication. Overall, it reads like a unified clinical note rather than a collaborative synthesis.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Claude_prompt-tuned_treatment_plan_manual.png}
+    \caption{\centering Claude 3.5 Prompt-Tuned: Treatment plan generated using role-aware prompt engineering.}
+    \label{fig:claude_prompt_tuned_treatment}
+\end{figure}
+
+The prompt-tuned version provides a major improvement in interprofessional clarity. Each team member’s contributions are clearly labeled—ranging from geneticist to social worker—and the recommendations are individualized. The language is collaborative and holistic, capturing both medical and psychosocial aspects of care. This version excels in maintaining the structure and formatting implied by the prompt, making it more readable and team-aware. Some redundancy is present, but overall, the prompt-tuned model performs well in balancing fluency with structure.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/GPT_base_treatment_plan_manual.png}
+    \caption{\centering GPT-4o Base: Treatment plan generated using a single general-purpose prompt.}
+    \label{fig:gpt_base_treatment}
+\end{figure}
+
+The base GPT-4o output is concise and clearly structured using bullet points and sections like “Goals”, “Procedures”, “Objectives”, and role headings. It touches on most core elements of the case—including speech therapy, ENT monitoring, and genetic counseling—but the content feels slightly abbreviated compared to Claude and LLaMA. There is limited elaboration within each section, and although role names appear (e.g., ENT, psychologist), they are inconsistently applied. The result is readable and moderately structured but lacks the richness and interprofessional clarity required in more comprehensive plans.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/GPT_prompt-tuned_treatment_plan_manual.png}
+    \caption{\centering GPT-4o Prompt-Tuned: Treatment plan generated using role-aware prompt engineering.}
+    \label{fig:gpt_prompt_tuned_treatment}
+\end{figure}
+
+The prompt-tuned version shows a clear improvement. Each team member is explicitly named, and the content is more detailed and discipline-specific. GPT-4o responds well to the structured prompt, producing well-separated sections and actionable insights tied to each role. Compared to Claude and LLaMA, however, the output is slightly more compact and at times omits nuanced elaboration. Still, the alignment with the prompt format and increased interprofessional relevance mark this as a significant step forward from the base configuration.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Llama_base_treatment_plan_llm.png}
+    \caption{\centering LLaMA 3.2 Base: Treatment plan generated from LLaMA-extracted data using a general-purpose prompt.}
+    \label{fig:llama_base_llm}
+\end{figure}
+
+The base output generated using LLaMA’s own extracted JSON shows moderate consistency with the expected structure, and covers core domains such as speech therapy, surgery, audiological monitoring, and family education. However, compared to its manually-prepared counterpart, this version is more repetitive and exhibits a slightly disjointed progression between sections. Although it ends with an attempt to delineate roles, the transition is abrupt and suggests overlap between role descriptions and previously stated goals. This degradation in formatting may stem from minor inaccuracies in the upstream JSON extraction, particularly around section boundaries and role attribution.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Llama_prompt-tuned_treatment_plan_llm.png}
+    \caption{\centering LLaMA 3.2 Prompt-Tuned: Treatment plan using LLaMA-extracted data with role-aware prompt.}
+    \label{fig:llama_prompt_tuned_llm}
+\end{figure}
+
+The prompt-tuned version demonstrates improved organization and significantly better role segmentation. Each team member is explicitly labeled, and the recommendations are tailored, consistent, and medically grounded. Despite this, the quality is still slightly lower than in the manually-prepared version. Some sections are dense, and there are occasional shifts in phrasing that imply content repetition. These limitations likely originate from imperfections in the extracted input—such as over- or under-specification of certain role responsibilities—yet the prompt-tuned structure mitigates these effects well.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Claude_base_treatment_plan_llm.png}
+    \caption{\centering Claude 3.5 Base: Treatment plan generated using Claude’s own extracted data and a general-purpose prompt.}
+    \label{fig:claude_base_llm}
+\end{figure}
+
+The base Claude output begins with a pseudo-diagnostic summary before transitioning into the treatment plan, blending structured care points with explanatory narrative. While the plan covers relevant medical and psychosocial domains—including speech therapy, surgery, education, and long-term follow-up—it lacks clear segmentation by professional roles. This impairs the readability and makes it difficult to trace recommendations to specific providers. These issues likely stem from the semi-structured nature of Claude’s extracted JSON, where certain headings and transitions were ambiguously parsed or omitted.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/Claude_prompt-tuned_treatment_plan_llm.png}
+    \caption{\centering Claude 3.5 Prompt-Tuned: Role-aware plan generated from Claude-prepared input.}
+    \label{fig:claude_prompt_tuned_llm}
+\end{figure}
+
+The prompt-tuned version exhibits significant improvements in structure and clarity. Each professional is clearly labeled, and their respective contributions are appropriately detailed and medically plausible. Compared to the base version, this output features improved alignment with IPE principles and fewer digressions into redundant or ambiguous phrasing. While there is some mild verbosity, it enhances comprehensiveness rather than cluttering the narrative. The consistency in tone and scope suggests that Claude’s extraction pipeline, when paired with a role-aware prompt, can produce high-quality outputs despite upstream noise.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/GPT_base_treatment_plan_llm.png}
+    \caption{\centering Treatment plan generated by GPT-4o using the base LLM approach with GPT-prepared data.}
+    \label{fig:gpt_base_llm_data}
+\end{figure}
+
+The base GPT-4o output is fairly structured and spans a broad range of domains—speech-language therapy, surgery, family education, behavioral monitoring, and more. The model adheres to a clear format with bolded section headings like \textbf{Objectives}, \textbf{Interventions}, and \textbf{Monitoring and Evaluation}, reflecting a semi-formal clinical style.
+
+While the output captures many correct clinical details, it leans heavily on general phrasing and lacks the profession-specific granularity that would be expected in a true interprofessional setting. Many recommendations are plausible, but vague—such as “support behavioral development” or “monitor progress”—which may reflect a limitation in how GPT interprets the more generic context provided by the auto-generated JSON. Compared to the manual-data results, this plan includes slightly less depth, but still maintains overall coherence and coverage.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Fig/GPT_prompt-tuned_treatment_plan_llm.png}
+    \caption{\centering Treatment plan generated by GPT-4o using the prompt-tuned approach with GPT-prepared data.}
+    \label{fig:gpt_prompt_tuned_llm_data}
+\end{figure}
+
+The prompt-tuned variant significantly improves role delineation. Each recommendation is clearly attributed to a specific team member (e.g., \textbf{ENT}, \textbf{Geneticist}, \textbf{SLP}, etc.), resulting in higher specificity and profession-aware responses. For instance, the audiologist's section covers hearing screenings and guidance to parents, while the geneticist focuses on syndrome education and counseling—both appropriate and contextually accurate.
+
+Despite using auto-generated structured data, the model delivers impressively contextualized outputs, likely benefiting from the instruction-rich prompt. The formatting is also clearer, and the content is better segmented. However, some redundancy is present between roles, and the explanations are less clinically rich than in the manual-data version. Still, this is a strong output overall, and clearly benefits from prompt tuning.
 
 
 %% Appendices may be used for helpful, supporting or essential material that would otherwise 
