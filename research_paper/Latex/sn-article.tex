@@ -399,7 +399,7 @@ We applied this prompt-tuned approach to all three LLMs under study—GPT-4o, Cl
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Fig/architecture.png}
+    \includegraphics[width=1.0\textwidth]{Fig/architecture.pdf}
     \caption{\centering MediSyn Architecture}
     \label{fig:architecture}
 \end{figure}
@@ -751,10 +751,130 @@ While all models demonstrated the ability to generate reasonable treatment plans
 By contrast, outputs generated from LLM-prepared inputs exhibited slightly more variability in role fidelity, section transitions, and clinical completeness. These differences likely stem from minor omissions, paraphrasing drift, or field inconsistencies during the automated extraction phase. That said, prompt tuning and MediSyn were largely robust to these imperfections, especially for Claude and GPT, whose downstream treatment plans retained high levels of coherence and collaborative depth. Overall, while manually prepared data offers a slight edge in quality, the LLM-extracted data pipelines remain viable and surprisingly strong for end-to-end simulation.
 
 
-\subsection{ LLM vs Prompt Tuned LLM vs MediSyn}\label{subsec4.4}
-\subsubsection{Manually prepared data}\label{subsec4.4.1}
-\subsubsection{LLM prepared data}\label{subsec4.4.2}
+% --------------------------------------------------------
+\subsection{LLM vs.\ Prompt–Tuned LLM vs.\ MediSyn}
+\label{subsec4.4}
 
+We now compare the three generation paradigms—\emph{Base Agent} (single LLM),
+\emph{Prompt–Tuned}, and the \emph{Synthesis-Agent} variant of \textsc{MediSyn}—under
+two input conditions:
+(i)~ JSONs obtained by \emph{manual} extraction, and
+(ii)~JSONs obtained fully \emph{automatically} by each LLM itself.
+Evaluation combines surface metrics (BLEU, ROUGE-1/-2/-L) with an
+LLM-as-a-Judge rubric (accuracy, plausibility, specificity, omission).
+
+% --------------------------------------------------------
+\subsubsection{Manually prepared data}
+\label{subsec4.4.1}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\linewidth]{Fig/Final_eval_DPM.png}
+  \caption{Aggregate automatic and human-aligned scores
+           (\textbf{manually curated JSON}).}
+  \label{fig:final_manual_table}
+\end{figure}
+
+Figure~\ref{fig:final_manual_table} shows that manually curated inputs lead to the
+highest absolute scores across all metrics:
+
+\begin{itemize}
+  \item \textbf{Claude 3.5.}  The \textsc{MediSyn} synthesis agent
+        matches the base model on BLEU/ROUGE but restores the
+        drop introduced by prompt tuning, yielding the best balance of
+        \textit{accuracy} (26.8) and the lowest \textit{omission} (9.3).
+
+  \item \textbf{GPT-4o.}  Prompt tuning and \textsc{MediSyn} are almost tied.
+        \textsc{MediSyn} edges ahead on \textit{accuracy} (25.7) while
+        keeping omissions comparable to the tuned setting.
+
+  \item \textbf{LLaMA 3.2.}  Tuning delivers the peak values for
+        \textit{accuracy} (25.6) and \textit{plausibility} (24.0);
+        \textsc{MediSyn} remains very close, with slightly higher
+        \textit{specificity} but a modest rise in omissions.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{Fig/OA_eval_DPM.png}
+  \caption{Average \textit{overall accuracy} per model and method
+           (manual JSON).}
+  \label{fig:overall_manual}
+\end{figure}
+
+The trend in Figure~\ref{fig:overall_manual} confirms that
+\textsc{MediSyn} offers a clear gain for Claude, whereas GPT-4o and
+LLaMA benefit most from \emph{either} prompt tuning or synthesis,
+with differences under~1\,pt.
+
+% --------------------------------------------------------
+\subsubsection{LLM-prepared data}
+\label{subsec4.4.2}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\linewidth]{Fig/Final_eval_DPL.png}
+  \caption{Aggregate automatic and human-aligned scores
+           (\textbf{LLM-extracted JSON}).}
+  \label{fig:final_llm_table}
+\end{figure}
+
+Automatic extraction introduces noise (mis-segmented fields, missing
+roles), lowering BLEU/ROUGE by 25–35 \%.
+Yet the relative ordering of methods is remarkably consistent
+(Figure~\ref{fig:final_llm_table}):
+
+\begin{itemize}
+  \item \textbf{Claude 3.5.}  \textsc{MediSyn} now yields the largest
+        jump, pushing \textit{accuracy} from~23.2 (base) to~38.4 and
+        \textit{specificity} from~20.9 to~36.5, even though omissions
+        rise to~17.4.
+
+  \item \textbf{GPT-4o.}  Prompt tuning remains the best compromise,
+        giving the highest \textit{accuracy} (20.0) and
+        \textit{plausibility} (18.6) with relatively low omissions (5.6);
+        the synthesis variant trails on these axes.
+
+  \item \textbf{LLaMA 3.2.}  Again, tuning produces the top
+        \textit{accuracy} (27.7).
+        \textsc{MediSyn} is a close second, but with fewer omissions
+        (14.2 vs.\ 9.3) at the cost of a small BLEU/ROUGE dip.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth]{Fig/OA_eval_DPL.png}
+  \caption{Average \textit{overall accuracy} per model and method
+           (LLM-extracted JSON).}
+  \label{fig:overall_llm}
+\end{figure}
+
+Figure~\ref{fig:overall_llm} highlights the more divergent behaviour
+under noisy inputs: Claude’s accuracy soars under synthesis, GPT-4o
+tops out with prompt tuning, and LLaMA displays a gentler rise.
+
+% --------------------------------------------------------
+\paragraph{Key take-aways.}
+Across both data conditions:
+
+\begin{enumerate}
+  \item \textbf{Data fidelity matters.}
+        Manual extraction increases absolute BLEU/ROUGE and reduces
+        omissions for every model–method pair.
+
+  \item \textbf{Claude benefits most from multi-agent synthesis},
+        turning noisy inputs into the highest human-aligned scores.
+
+  \item \textbf{Prompt tuning is a strong low-cost baseline} for
+        GPT-4o and LLaMA, often matching or surpassing synthesis
+        without architectural overhead.
+
+  \item \textbf{\textsc{MediSyn} is robust.}
+        Even when it is not the top performer, the synthesis agent
+        never catastrophically degrades output quality and often
+        delivers the best \emph{specificity}—an essential dimension for
+        IPE/IPP contexts.
+\end{enumerate}
 
 \section{Discussion and Limitations}\label{sec5}
 

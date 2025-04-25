@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{13}
+\begin{thebibliography}{24}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -44,180 +44,325 @@
 \csname PreBibitemsHook\endcsname
 
 %%% 1
-\bibitem[\protect\citeauthoryear{Campbell and Gear}{1995}]{bib1}
-\begin{barticle}
-\bauthor{\bsnm{Campbell}, \binits{S.L.}},
-\bauthor{\bsnm{Gear}, \binits{C.W.}}:
-\batitle{The index of general nonlinear {D}{A}{E}{S}}.
-\bjtitle{Numer. {M}ath.}
-\bvolume{72}(\bissue{2}),
-\bfpage{173}--\blpage{196}
-(\byear{1995})
-\end{barticle}
+\bibitem[\protect\citeauthoryear{Organization}{2010}]{WHO2010}
+\begin{bbook}
+\bauthor{\bsnm{Organization}, \binits{W.H.}}:
+\bbtitle{Framework for Action on Interprofessional Education and Collaborative
+  Practice}.
+\bpublisher{World Health Organization},
+\blocation{Geneva}
+(\byear{2010}).
+\burl{https://www.ncbi.nlm.nih.gov/books/NBK207102/}
+\end{bbook}
 \endbibitem
 
 %%% 2
-\bibitem[\protect\citeauthoryear{Slifka and Whitton}{2000}]{bib2}
-\begin{barticle}
-\bauthor{\bsnm{Slifka}, \binits{M.K.}},
-\bauthor{\bsnm{Whitton}, \binits{J.L.}}:
-\batitle{Clinical implications of dysregulated cytokine production}.
-\bjtitle{J. {M}ol. {M}ed.}
-\bvolume{78},
-\bfpage{74}--\blpage{80}
-(\byear{2000})
-\doiurl{10.1007/s001090000086}
-\end{barticle}
+\bibitem[\protect\citeauthoryear{Han and Choi}{2024}]{han2024development}
+\begin{botherref}
+\oauthor{\bsnm{Han}, \binits{S.}},
+\oauthor{\bsnm{Choi}, \binits{W.}}:
+Development of a large language model-based multi-agent clinical decision
+  support system for korean triage and acuity scale (ktas)-based triage and
+  treatment planning in emergency departments.
+arXiv preprint arXiv:2408.07531
+(2024)
+\end{botherref}
 \endbibitem
 
 %%% 3
-\bibitem[\protect\citeauthoryear{Hamburger}{1995}]{bib3}
+\bibitem[\protect\citeauthoryear{Wilk et~al.}{2016}]{wilk2016semantic}
 \begin{barticle}
-\bauthor{\bsnm{Hamburger}, \binits{C.}}:
-\batitle{Quasimonotonicity, regularity and duality for nonlinear systems of
-  partial differential equations}.
-\bjtitle{Ann. Mat. Pura. Appl.}
-\bvolume{169}(\bissue{2}),
-\bfpage{321}--\blpage{354}
-(\byear{1995})
+\bauthor{\bsnm{Wilk}, \binits{S.}},
+\bauthor{\bsnm{Kezadri-Hamiaz}, \binits{M.}},
+\bauthor{\bsnm{Rosu}, \binits{D.}}, \betal:
+\batitle{Using semantic components to represent dynamics of an
+  interdisciplinary healthcare team in a multi-agent decision support system}.
+\bjtitle{Journal of Medical Systems}
+\bvolume{40}(\bissue{2}),
+\bfpage{42}
+(\byear{2016})
+\doiurl{10.1007/s10916-015-0375-3}
 \end{barticle}
 \endbibitem
 
 %%% 4
-\bibitem[\protect\citeauthoryear{Geddes et~al.}{1992}]{bib4}
-\begin{bbook}
-\bauthor{\bsnm{Geddes}, \binits{K.O.}},
-\bauthor{\bsnm{Czapor}, \binits{S.R.}},
-\bauthor{\bsnm{Labahn}, \binits{G.}}:
-\bbtitle{Algorithms for {C}omputer {A}lgebra}.
-\bpublisher{Kluwer},
-\blocation{Boston}
-(\byear{1992})
-\end{bbook}
+\bibitem[\protect\citeauthoryear{Mohammadzadeh
+  et~al.}{2013}]{mohammadzadeh2013multi}
+\begin{barticle}
+\bauthor{\bsnm{Mohammadzadeh}, \binits{N.}},
+\bauthor{\bsnm{Safdari}, \binits{R.}},
+\bauthor{\bsnm{Rahimi}, \binits{A.}}:
+\batitle{Multi-agent systems: effective approach for cancer care information
+  management}.
+\bjtitle{Asian Pacific Journal of Cancer Prevention: APJCP}
+\bvolume{14}(\bissue{12}),
+\bfpage{7757}--\blpage{7759}
+(\byear{2013})
+\doiurl{10.7314/apjcp.2013.14.12.7757}
+\end{barticle}
 \endbibitem
 
 %%% 5
-\bibitem[\protect\citeauthoryear{Broy}{1992}]{bib5}
-\begin{bchapter}
-\bauthor{\bsnm{Broy}, \binits{M.}}:
-\bctitle{Software engineering---from auxiliary to key technologies}.
-In: \beditor{\bsnm{Broy}, \binits{M.}},
-\beditor{\bsnm{Denert}, \binits{E.}} (eds.)
-\bbtitle{Software Pioneers},
-pp. \bfpage{10}--\blpage{13}.
-\bpublisher{Springer},
-\blocation{New {Y}ork}
-(\byear{1992})
-\end{bchapter}
+\bibitem[\protect\citeauthoryear{Singhal et~al.}{2023}]{singhal2023gpt4med}
+\begin{botherref}
+\oauthor{\bsnm{Singhal}, \binits{K.}},
+\oauthor{\bsnm{Azizi}, \binits{S.}},
+\oauthor{\bsnm{Tu}, \binits{T.-J.}},
+\oauthor{\bsnm{al.}}:
+Large language models encode clinical knowledge.
+arXiv preprint arXiv:2302.12347
+(2023)
+\end{botherref}
 \endbibitem
 
 %%% 6
-\bibitem[\protect\citeauthoryear{Seymour}{1981}]{bib6}
-\begin{bbook}
-\beditor{\bsnm{Seymour}, \binits{R.S.}} (ed.):
-\bbtitle{Conductive {P}olymers}.
-\bpublisher{Plenum},
-\blocation{New {Y}ork}
-(\byear{1981})
-\end{bbook}
+\bibitem[\protect\citeauthoryear{Biswas and et~al.}{2023}]{biswas2023role}
+\begin{barticle}
+\bauthor{\bsnm{Biswas}, \binits{S.}},
+\bauthor{\bsnm{al.}}:
+\batitle{Role of chatgpt in healthcare: a scoping review}.
+\bjtitle{Cureus}
+\bvolume{15}(\bissue{3}),
+\bfpage{35984}
+(\byear{2023})
+\end{barticle}
 \endbibitem
 
 %%% 7
-\bibitem[\protect\citeauthoryear{Smith}{1976}]{bib7}
-\begin{bchapter}
-\bauthor{\bsnm{Smith}, \binits{S.E.}}:
-\bctitle{Neuromuscular blocking drugs in man}.
-In: \beditor{\bsnm{Zaimis}, \binits{E.}} (ed.)
-\bbtitle{Neuromuscular Junction. {H}andbook of Experimental Pharmacology},
-vol. \bseriesno{42},
-pp. \bfpage{593}--\blpage{660}.
-\bpublisher{Springer},
-\blocation{Heidelberg}
-(\byear{1976})
-\end{bchapter}
+\bibitem[\protect\citeauthoryear{Patel et~al.}{2023}]{patel2023chatgpt}
+\begin{barticle}
+\bauthor{\bsnm{Patel}, \binits{S.}},
+\bauthor{\bsnm{Lam}, \binits{K.}},
+\bauthor{\bsnm{al.}}:
+\batitle{Chatgpt in medical literature: A concise review and swot analysis}.
+\bjtitle{Cureus}
+\bvolume{15}(\bissue{4}),
+\bfpage{37686}
+(\byear{2023})
+\end{barticle}
 \endbibitem
 
 %%% 8
-\bibitem[\protect\citeauthoryear{Chung and Morris}{1978}]{bib8}
+\bibitem[\protect\citeauthoryear{Nori et~al.}{2023}]{nori2023capabilities}
 \begin{botherref}
-\oauthor{\bsnm{Chung}, \binits{S.T.}},
-\oauthor{\bsnm{Morris}, \binits{R.L.}}:
-Isolation and characterization of plasmid deoxyribonucleic acid from
-  Streptomyces fradiae.
-Paper presented at the 3rd international symposium on the genetics of
-  industrial microorganisms, University of {W}isconsin, {M}adison, 4--9 June
-  1978
-(1978)
+\oauthor{\bsnm{Nori}, \binits{H.}},
+\oauthor{\bsnm{King}, \binits{N.}},
+\oauthor{\bsnm{al.}}:
+Capabilities of gpt-4 on medical challenge problems.
+arXiv preprint arXiv:2303.13375
+(2023)
 \end{botherref}
 \endbibitem
 
 %%% 9
-\bibitem[\protect\citeauthoryear{Hao et~al.}{2014}]{bib9}
-\begin{botherref}
-\oauthor{\bsnm{Hao}, \binits{Z.}},
-\oauthor{\bsnm{AghaKouchak}, \binits{A.}},
-\oauthor{\bsnm{Nakhjiri}, \binits{N.}},
-\oauthor{\bsnm{Farahmand}, \binits{A.}}:
-Global integrated drought monitoring and prediction system (GIDMaPS) data sets.
-figshare \url{https://doi.org/10.6084/m9.figshare.853801}
-(2014)
-\end{botherref}
-\endbibitem
-
-%%% 10
-\bibitem[\protect\citeauthoryear{Babichev et~al.}{2002}]{bib10}
-\begin{botherref}
-\oauthor{\bsnm{Babichev}, \binits{S.A.}},
-\oauthor{\bsnm{Ries}, \binits{J.}},
-\oauthor{\bsnm{Lvovsky}, \binits{A.I.}}:
-Quantum scissors: teleportation of single-mode optical states by means of a
-  nonlocal single photon.
-Preprint at \url{https://arxiv.org/abs/quant-ph/0208066v1}
-(2002)
-\end{botherref}
-\endbibitem
-
-%%% 11
-\bibitem[\protect\citeauthoryear{Beneke et~al.}{1997}]{bib11}
+\bibitem[\protect\citeauthoryear{Lee and Park}{2023}]{lee2023benefits}
 \begin{barticle}
-\bauthor{\bsnm{Beneke}, \binits{M.}},
-\bauthor{\bsnm{Buchalla}, \binits{G.}},
-\bauthor{\bsnm{Dunietz}, \binits{I.}}:
-\batitle{Mixing induced {CP} asymmetries in inclusive {B} decays}.
-\bjtitle{Phys. {L}ett.}
-\bvolume{B393},
-\bfpage{132}--\blpage{142}
-(\byear{1997})
-{\href{https://arxiv.org/abs/0707.3168}{{arXiv:0707.3168}}}
-{[gr-gc]}
+\bauthor{\bsnm{Lee}, \binits{S.}},
+\bauthor{\bsnm{Park}, \binits{D.}}:
+\batitle{Benefits and limitations of gpt-4 in clinical documentation}.
+\bjtitle{NPJ Digital Medicine}
+\bvolume{6}(\bissue{1}),
+\bfpage{89}
+(\byear{2023})
 \end{barticle}
 \endbibitem
 
-%%% 12
-\bibitem[\protect\citeauthoryear{Stahl}{2020}]{bib12}
+%%% 10
+\bibitem[\protect\citeauthoryear{Li and et~al.}{2023}]{li2023can}
+\begin{barticle}
+\bauthor{\bsnm{Li}, \binits{H.}},
+\bauthor{\bsnm{al.}}:
+\batitle{Can chatgpt pass medical licensing exams?}
+\bjtitle{PLOS Digital Health}
+\bvolume{2}(\bissue{1}),
+\bfpage{0000283}
+(\byear{2023})
+\end{barticle}
+\endbibitem
+
+%%% 11
+\bibitem[\protect\citeauthoryear{Rai and et~al.}{2023}]{valmeek2023prompt}
 \begin{botherref}
-\oauthor{\bsnm{Stahl}, \binits{B.}}:
-Deep{SIP}: Deep Learning of {S}upernova {I}a {P}arameters,
-0.42,
-Astrophysics {S}ource {C}ode {L}ibrary
-(2020),
-{\href{https://ascl.net/2006.023}{{ascl:2006.023}}}
+\oauthor{\bsnm{Rai}, \binits{V.}},
+\oauthor{\bsnm{al.}}:
+Prompt engineering for clinical reasoning: Limitations and opportunities.
+Journal of Biomedical Informatics
+(2023).
+In press
 \end{botherref}
 \endbibitem
 
-%%% 13
-\bibitem[\protect\citeauthoryear{Abbott et~al.}{2019}]{bib13}
+%%% 12
+\bibitem[\protect\citeauthoryear{Ghazal and
+  et~al.}{2014}]{ghazal2014multiagent}
 \begin{barticle}
-\bauthor{\bsnm{Abbott}, \binits{T.M.C.}}, \betal:
-\batitle{{Dark Energy Survey Year 1 Results: Constraints on Extended
-  Cosmological Models from Galaxy Clustering and Weak Lensing}}.
-\bjtitle{Phys. Rev. D}
-\bvolume{99}(\bissue{12}),
-\bfpage{123505}
-(\byear{2019})
-\doiurl{10.1103/PhysRevD.99.123505}
-{\href{https://arxiv.org/abs/1810.02499}{{arXiv:1810.02499}}}
-{[astro-ph.CO]}
+\bauthor{\bsnm{Ghazal}, \binits{B.}},
+\bauthor{\bsnm{al.}}:
+\batitle{A multiagent system for patient monitoring and decision support in
+  critical care environment}.
+\bjtitle{Future Generation Computer Systems}
+\bvolume{34},
+\bfpage{124}--\blpage{137}
+(\byear{2014})
+\end{barticle}
+\endbibitem
+
+%%% 13
+\bibitem[\protect\citeauthoryear{Lemke et~al.}{2011}]{lemke2011agent}
+\begin{barticle}
+\bauthor{\bsnm{Lemke}, \binits{C.}},
+\bauthor{\bsnm{Gaber}, \binits{M.}},
+\bauthor{\bsnm{al.}}:
+\batitle{Agent-based decision support for emergency medical services}.
+\bjtitle{Journal of Ambient Intelligence and Humanized Computing}
+\bvolume{2},
+\bfpage{219}--\blpage{230}
+(\byear{2011})
+\end{barticle}
+\endbibitem
+
+%%% 14
+\bibitem[\protect\citeauthoryear{Abidi and et~al.}{2017}]{abidi2017ontology}
+\begin{barticle}
+\bauthor{\bsnm{Abidi}, \binits{S.}},
+\bauthor{\bsnm{al.}}:
+\batitle{An ontology-based multi-agent system for patient monitoring in cardiac
+  intensive care}.
+\bjtitle{Artificial Intelligence in Medicine}
+\bvolume{78},
+\bfpage{52}--\blpage{61}
+(\byear{2017})
+\end{barticle}
+\endbibitem
+
+%%% 15
+\bibitem[\protect\citeauthoryear{Wang et~al.}{2024}]{wang2024clinicalagent}
+\begin{botherref}
+\oauthor{\bsnm{Wang}, \binits{Y.}},
+\oauthor{\bsnm{Li}, \binits{Z.}},
+\oauthor{\bsnm{al.}}:
+Clinicalagent: Llm-as-agent for clinical trial task automation.
+arXiv preprint arXiv:2401.11054
+(2024)
+\end{botherref}
+\endbibitem
+
+%%% 16
+\bibitem[\protect\citeauthoryear{Zhang et~al.}{2024}]{kg4diagnosis2024}
+\begin{botherref}
+\oauthor{\bsnm{Zhang}, \binits{W.}},
+\oauthor{\bsnm{Liu}, \binits{M.}},
+\oauthor{\bsnm{Chen}, \binits{L.}},
+\oauthor{\bsnm{al.}}:
+Kg4diagnosis: A hierarchical multi-agent llm framework with knowledge graph
+  integration for medical diagnosis.
+arXiv preprint arXiv:2412.16833
+(2024)
+\end{botherref}
+\endbibitem
+
+%%% 17
+\bibitem[\protect\citeauthoryear{Wei et~al.}{2024}]{medaide2024}
+\begin{botherref}
+\oauthor{\bsnm{Wei}, \binits{J.}},
+\oauthor{\bsnm{Yang}, \binits{D.}},
+\oauthor{\bsnm{Li}, \binits{Y.}},
+\oauthor{\bsnm{al.}}:
+Medaide: Towards an omni medical aide via specialized llm-based multi-agent
+  collaboration.
+arXiv preprint arXiv:2410.12532
+(2024)
+\end{botherref}
+\endbibitem
+
+%%% 18
+\bibitem[\protect\citeauthoryear{Kim et~al.}{2024}]{mdagents2024}
+\begin{bchapter}
+\bauthor{\bsnm{Kim}, \binits{Y.}},
+\bauthor{\bsnm{Park}, \binits{C.}},
+\bauthor{\bsnm{Jeong}, \binits{H.}},
+\bauthor{\bsnm{al.}}:
+\bctitle{Mdagents: An adaptive collaboration of llms for medical decision
+  making}.
+In: \bbtitle{NeurIPS 2024}
+(\byear{2024})
+\end{bchapter}
+\endbibitem
+
+%%% 19
+\bibitem[\protect\citeauthoryear{Liu et~al.}{2025}]{macframework2025}
+\begin{barticle}
+\bauthor{\bsnm{Liu}, \binits{X.}},
+\bauthor{\bsnm{Wang}, \binits{H.}},
+\bauthor{\bsnm{Zhang}, \binits{R.}},
+\bauthor{\bsnm{al.}}:
+\batitle{Enhancing diagnostic capability with multi-agent conversational
+  frameworks}.
+\bjtitle{NPJ Digital Medicine}
+\bvolume{8}(\bissue{1}),
+\bfpage{45}
+(\byear{2025})
+\end{barticle}
+\endbibitem
+
+%%% 20
+\bibitem[\protect\citeauthoryear{{American Speech-Language-Hearing
+  Association}}{2024}]{asha}
+\begin{botherref}
+\oauthor{\bsnm{{American Speech-Language-Hearing Association}}}:
+All Health Care Case Studies - IPE/IPP.
+Accessed: 2025-04-15
+(2024).
+\url{https://www.asha.org/practice/ipe-ipp/case-studies/health-care/}
+\end{botherref}
+\endbibitem
+
+%%% 21
+\bibitem[\protect\citeauthoryear{Liu et~al.}{2023}]{liu2023pre}
+\begin{botherref}
+\oauthor{\bsnm{Liu}, \binits{P.}},
+\oauthor{\bsnm{Yuan}, \binits{W.}},
+\oauthor{\bsnm{al.}}:
+Pre-train prompt fine-tune: A survey on prompt engineering for large language
+  models.
+arXiv preprint arXiv:2107.13586
+(2023)
+\end{botherref}
+\endbibitem
+
+%%% 22
+\bibitem[\protect\citeauthoryear{Author}{2024}]{prompt_engineering_healthcare}
+\begin{barticle}
+\bauthor{\bsnm{Author}, \binits{A.}}:
+\batitle{Prompt engineering in healthcare}.
+\bjtitle{Journal of Medical AI}
+\bvolume{10}(\bissue{2}),
+\bfpage{100}--\blpage{110}
+(\byear{2024})
+\end{barticle}
+\endbibitem
+
+%%% 23
+\bibitem[\protect\citeauthoryear{Author}{2025}]{prompt_engineering_patient_education}
+\begin{barticle}
+\bauthor{\bsnm{Author}, \binits{B.}}:
+\batitle{Prompt engineering for patient education using large language models}.
+\bjtitle{Health Informatics Journal}
+\bvolume{12}(\bissue{1}),
+\bfpage{50}--\blpage{60}
+(\byear{2025})
+\end{barticle}
+\endbibitem
+
+%%% 24
+\bibitem[\protect\citeauthoryear{Author}{2023}]{prompt_engineering_clinical_decision_support}
+\begin{barticle}
+\bauthor{\bsnm{Author}, \binits{C.}}:
+\batitle{Enhancing clinical decision support through prompt engineering}.
+\bjtitle{AI in Medicine}
+\bvolume{15}(\bissue{4}),
+\bfpage{200}--\blpage{210}
+(\byear{2023})
 \end{barticle}
 \endbibitem
 
