@@ -40,7 +40,9 @@ def bar_plots(summary, llm_name, data):
         axes[i].set_xlabel("Method")
     fig.suptitle(f'{llm_name} Evaluation ({data})')
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f"{llm_name}_{data.replace(' ', '_')}_barplot.pdf", format='pdf')
+    plt.close()
+
 
 # Bar plots for average evaluation metrics by method(base vs tuned vs synthesis) for manually prepared data
 manual_claude_df['method'] = manual_claude_df['output_file'].apply(extract_method)
@@ -125,7 +127,8 @@ plt.ylabel('Average Overall Accuracy')
 plt.legend(title='Model')
 plt.grid(True)
 plt.tight_layout()
-plt.show()
+plt.savefig("Overall_Accuracy_Comparison_Manual.pdf", format='pdf')
+plt.close()
 
 # -------------------------------------- XXXX ---------------------------------------
 
@@ -189,4 +192,5 @@ plt.ylabel('Average Overall Accuracy')
 plt.legend(title='Model')
 plt.grid(True)
 plt.tight_layout()
-plt.show()
+plt.savefig("Overall_Accuracy_Comparison_LLM.pdf", format='pdf')
+plt.close()

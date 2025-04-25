@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{24}
+\begin{thebibliography}{25}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -318,6 +318,27 @@ Accessed: 2025-04-15
 \endbibitem
 
 %%% 21
+\bibitem[\protect\citeauthoryear{Croxford et~al.}{2024}]{croxford2024human}
+\begin{barticle}
+\bauthor{\bsnm{Croxford}, \binits{E.}},
+\bauthor{\bsnm{Gao}, \binits{Y.}},
+\bauthor{\bsnm{Patterson}, \binits{B.}},
+\bauthor{\bsnm{To}, \binits{D.}},
+\bauthor{\bsnm{Tesch}, \binits{S.}},
+\bauthor{\bsnm{Dligach}, \binits{D.}},
+\bauthor{\bsnm{Mayampurath}, \binits{A.}},
+\bauthor{\bsnm{Churpek}, \binits{M.M.}},
+\bauthor{\bsnm{Afshar}, \binits{M.}}:
+\batitle{Development of a human evaluation framework and correlation with
+  automated metrics for natural language generation of medical diagnoses}.
+\bjtitle{medRxiv}
+(\byear{2024})
+\doiurl{10.1101/2024.03.20.24304620} .
+\bcomment{Preprint}
+\end{barticle}
+\endbibitem
+
+%%% 22
 \bibitem[\protect\citeauthoryear{Liu et~al.}{2023}]{liu2023pre}
 \begin{botherref}
 \oauthor{\bsnm{Liu}, \binits{P.}},
@@ -330,7 +351,7 @@ arXiv preprint arXiv:2107.13586
 \end{botherref}
 \endbibitem
 
-%%% 22
+%%% 23
 \bibitem[\protect\citeauthoryear{Author}{2024}]{prompt_engineering_healthcare}
 \begin{barticle}
 \bauthor{\bsnm{Author}, \binits{A.}}:
@@ -342,7 +363,7 @@ arXiv preprint arXiv:2107.13586
 \end{barticle}
 \endbibitem
 
-%%% 23
+%%% 24
 \bibitem[\protect\citeauthoryear{Author}{2025}]{prompt_engineering_patient_education}
 \begin{barticle}
 \bauthor{\bsnm{Author}, \binits{B.}}:
@@ -354,7 +375,7 @@ arXiv preprint arXiv:2107.13586
 \end{barticle}
 \endbibitem
 
-%%% 24
+%%% 25
 \bibitem[\protect\citeauthoryear{Author}{2023}]{prompt_engineering_clinical_decision_support}
 \begin{barticle}
 \bauthor{\bsnm{Author}, \binits{C.}}:

@@ -399,7 +399,7 @@ We applied this prompt-tuned approach to all three LLMs under study—GPT-4o, Cl
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Fig/architecture.pdf}
+    \includegraphics[width=1.0\textwidth]{Fig/architecture}
     \caption{\centering MediSyn Architecture}
     \label{fig:architecture}
 \end{figure}
@@ -414,7 +414,7 @@ Following the agent-level reasoning, MediSyn activates a \textit{Synthesis Agent
 
 Importantly, MediSyn is model-agnostic. The system’s modular architecture allows experimentation with different LLM backends—GPT-4o, Claude 3.5, or LLaMA 3.2—at both the agent and synthesis levels. This design facilitates fine-grained benchmarking of agent-level and system-level performance across models.
 
-In sum, MediSyn provides a scalable framework for simulating interprofessional reasoning in healthcare. It combines role-driven specialization with collaborative synthesis, offering a closer approximation of real-world IPE practice than existing single-model or prompt-tuned approaches. The system thus serves as both a research platform and a pedagogical tool for evaluating and enhancing AI support for interprofessional collaboration in clinical settings.
+In sum, MediSyn provides a framework for simulating interprofessional reasoning in healthcare. It combines role-driven specialization with collaborative synthesis, offering a closer approximation of real-world IPE practice than existing single-model or prompt-tuned approaches. The system thus serves as both a research platform and a pedagogical tool for evaluating and enhancing AI support for interprofessional collaboration in clinical settings.
 
 \subsection{Evaluation Methods}\label{subsec3.6}
 
@@ -456,7 +456,7 @@ where \( \text{Count}_{\text{match}} \) refers to the number of overlapping n-gr
 
 \subsubsection{LLM as a Judge}\label{subsec3.6.3}
 
-Beyond surface-level similarity, we incorporated a qualitative evaluation framework by prompting LLMs to act as domain-aware evaluators of generated treatment plans. This method, inspired by recent works in LLM-based benchmarking, allows us to assess the outputs across multiple clinical axes—namely plausibility, specificity, accuracy, and omission.
+Beyond surface-level similarity, we incorporated a qualitative evaluation framework by prompting LLMs to act as domain-aware evaluators of generated treatment plans. This method, inspired by recent works in LLM-based benchmarking\cite{croxford2024human}, allows us to assess the outputs across multiple clinical axes—namely plausibility, specificity, accuracy, and omission.
 
 Each plan is blindly reviewed by an LLM, which is instructed to rate it on a 1–5 scale for each of the following criteria:
 
@@ -755,127 +755,106 @@ By contrast, outputs generated from LLM-prepared inputs exhibited slightly more 
 \subsection{LLM vs.\ Prompt–Tuned LLM vs.\ MediSyn}
 \label{subsec4.4}
 
-We now compare the three generation paradigms—\emph{Base Agent} (single LLM),
-\emph{Prompt–Tuned}, and the \emph{Synthesis-Agent} variant of \textsc{MediSyn}—under
-two input conditions:
-(i)~ JSONs obtained by \emph{manual} extraction, and
-(ii)~JSONs obtained fully \emph{automatically} by each LLM itself.
-Evaluation combines surface metrics (BLEU, ROUGE-1/-2/-L) with an
-LLM-as-a-Judge rubric (accuracy, plausibility, specificity, omission).
+We now compare three generation paradigms—\emph{Base Agent} (single LLM), \emph{Prompt–Tuned}, and the \emph{Synthesis-Agent} variant of \textsc{MediSyn}—under two input conditions:
+(i)~JSONs obtained by \emph{manual} extraction, and (ii)~JSONs obtained fully \emph{automatically} by each LLM.
+Evaluation combines surface metrics (BLEU, ROUGE-1/-2/-L) with an LLM-as-a-Judge rubric (accuracy, plausibility, specificity, omission).
 
 % --------------------------------------------------------
 \subsubsection{Manually prepared data}
 \label{subsec4.4.1}
 
 \begin{figure}[H]
-  \centering
-  \includegraphics[width=0.95\linewidth]{Fig/Final_eval_DPM.png}
-  \caption{Aggregate automatic and human-aligned scores
-           (\textbf{manually curated JSON}).}
-  \label{fig:final_manual_table}
+    \centering
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/GPT-4o_Data_Prepared_Manually_barplot.pdf}
+        \caption{GPT-4o}
+        \label{fig:gpt_manual_bar}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/Llama_Data_Prepared_Manually_barplot.pdf}
+        \caption{LLaMA 3.2}
+        \label{fig:llama_manual_bar}
+    \end{subfigure}
+
+    \vspace{0.8em}
+
+    \begin{subfigure}[t]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/Claude_eval_DPM.png}
+        \caption{Claude 3.5}
+        \label{fig:claude_manual_bar}
+    \end{subfigure}
+
+    \caption{Metric-wise comparison across methods with manually curated data.}
+    \label{fig:manual_bars}
 \end{figure}
 
-Figure~\ref{fig:final_manual_table} shows that manually curated inputs lead to the
-highest absolute scores across all metrics:
-
-\begin{itemize}
-  \item \textbf{Claude 3.5.}  The \textsc{MediSyn} synthesis agent
-        matches the base model on BLEU/ROUGE but restores the
-        drop introduced by prompt tuning, yielding the best balance of
-        \textit{accuracy} (26.8) and the lowest \textit{omission} (9.3).
-
-  \item \textbf{GPT-4o.}  Prompt tuning and \textsc{MediSyn} are almost tied.
-        \textsc{MediSyn} edges ahead on \textit{accuracy} (25.7) while
-        keeping omissions comparable to the tuned setting.
-
-  \item \textbf{LLaMA 3.2.}  Tuning delivers the peak values for
-        \textit{accuracy} (25.6) and \textit{plausibility} (24.0);
-        \textsc{MediSyn} remains very close, with slightly higher
-        \textit{specificity} but a modest rise in omissions.
-\end{itemize}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\linewidth]{Fig/OA_eval_DPM.png}
-  \caption{Average \textit{overall accuracy} per model and method
-           (manual JSON).}
-  \label{fig:overall_manual}
-\end{figure}
-
-The trend in Figure~\ref{fig:overall_manual} confirms that
-\textsc{MediSyn} offers a clear gain for Claude, whereas GPT-4o and
-LLaMA benefit most from \emph{either} prompt tuning or synthesis,
-with differences under~1\,pt.
+Across manually curated inputs, Claude’s synthesis agent in MediSyn clearly outperforms the base and tuned variants on human-aligned metrics such as accuracy and specificity, while keeping omission relatively low. For GPT-4o, prompt tuning and synthesis perform comparably, with MediSyn slightly ahead on accuracy. LLaMA 3.2 shows peak values on accuracy and plausibility with prompt tuning, while synthesis gives higher specificity at a modest omission cost.
 
 % --------------------------------------------------------
 \subsubsection{LLM-prepared data}
 \label{subsec4.4.2}
 
 \begin{figure}[H]
-  \centering
-  \includegraphics[width=0.95\linewidth]{Fig/Final_eval_DPL.png}
-  \caption{Aggregate automatic and human-aligned scores
-           (\textbf{LLM-extracted JSON}).}
-  \label{fig:final_llm_table}
+    \centering
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/GPT-4o_Data_Prepared_by_GPT_barplot.pdf}
+        \caption{GPT-4o}
+        \label{fig:gpt_llm_bar}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/Llama_Data_Prepared_Llama_barplot.pdf}
+        \caption{LLaMA 3.2}
+        \label{fig:llama_llm_bar}
+    \end{subfigure}
+
+    \vspace{0.8em}
+
+    \begin{subfigure}[t]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/Claude_eval_DPL.png}
+        \caption{Claude 3.5}
+        \label{fig:claude_llm_bar}
+    \end{subfigure}
+
+    \caption{Metric-wise comparison across methods with LLM-prepared data.}
+    \label{fig:llm_bars}
 \end{figure}
 
-Automatic extraction introduces noise (mis-segmented fields, missing
-roles), lowering BLEU/ROUGE by 25–35 \%.
-Yet the relative ordering of methods is remarkably consistent
-(Figure~\ref{fig:final_llm_table}):
-
-\begin{itemize}
-  \item \textbf{Claude 3.5.}  \textsc{MediSyn} now yields the largest
-        jump, pushing \textit{accuracy} from~23.2 (base) to~38.4 and
-        \textit{specificity} from~20.9 to~36.5, even though omissions
-        rise to~17.4.
-
-  \item \textbf{GPT-4o.}  Prompt tuning remains the best compromise,
-        giving the highest \textit{accuracy} (20.0) and
-        \textit{plausibility} (18.6) with relatively low omissions (5.6);
-        the synthesis variant trails on these axes.
-
-  \item \textbf{LLaMA 3.2.}  Again, tuning produces the top
-        \textit{accuracy} (27.7).
-        \textsc{MediSyn} is a close second, but with fewer omissions
-        (14.2 vs.\ 9.3) at the cost of a small BLEU/ROUGE dip.
-\end{itemize}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\linewidth]{Fig/OA_eval_DPL.png}
-  \caption{Average \textit{overall accuracy} per model and method
-           (LLM-extracted JSON).}
-  \label{fig:overall_llm}
-\end{figure}
-
-Figure~\ref{fig:overall_llm} highlights the more divergent behaviour
-under noisy inputs: Claude’s accuracy soars under synthesis, GPT-4o
-tops out with prompt tuning, and LLaMA displays a gentler rise.
+LLM-extracted inputs introduce noise but preserve consistent method rankings. For Claude, the MediSyn architecture produces a substantial leap in accuracy and specificity, highlighting its robustness to input quality. GPT-4o performs best with prompt tuning under noisy conditions, balancing accuracy with minimal omission. LLaMA again peaks in accuracy through tuning, with synthesis trailing closely but offering better specificity.
 
 % --------------------------------------------------------
-\paragraph{Key take-aways.}
-Across both data conditions:
+\subsubsection*{Key takeaways and overall accuracy trends}
 
-\begin{enumerate}
-  \item \textbf{Data fidelity matters.}
-        Manual extraction increases absolute BLEU/ROUGE and reduces
-        omissions for every model–method pair.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/Overall_Accuracy_Comparison_Manual.pdf}
+        \caption{Manual JSON}
+        \label{fig:overall_manual}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Fig/Overall_Accuracy_Comparison_LLM.pdf}
+        \caption{LLM JSON}
+        \label{fig:overall_llm}
+    \end{subfigure}
+    \caption{Average \textit{overall accuracy} across models and methods.}
+    \label{fig:overall_accuracy_combined}
+\end{figure}
 
-  \item \textbf{Claude benefits most from multi-agent synthesis},
-        turning noisy inputs into the highest human-aligned scores.
+\noindent
+These figures highlight that manual data consistently enhances absolute scores and lowers omissions. Among the LLMs, Claude 3.5 benefits the most from MediSyn, especially with noisy data—showing the sharpest gain in both accuracy and specificity. GPT-4o is more responsive to prompt tuning across both data regimes, with its synthesis variant showing slight improvements in interpretability. LLaMA 3.2 achieves high accuracy with prompt tuning but sees gains in specificity under the synthesis model. MediSyn remains a stable and high-performing method even under LLM-induced noise, confirming its effectiveness as a collaborative framework in multi-agent clinical reasoning.
 
-  \item \textbf{Prompt tuning is a strong low-cost baseline} for
-        GPT-4o and LLaMA, often matching or surpassing synthesis
-        without architectural overhead.
-
-  \item \textbf{\textsc{MediSyn} is robust.}
-        Even when it is not the top performer, the synthesis agent
-        never catastrophically degrades output quality and often
-        delivers the best \emph{specificity}—an essential dimension for
-        IPE/IPP contexts.
-\end{enumerate}
-
+%--------------------------------------------------------
 \section{Discussion and Limitations}\label{sec5}
 
 \section{Conclusion}\label{sec6}
@@ -1147,13 +1126,9 @@ RULES:
     \caption{\centering GPT-4o: Treatment plan outputs generated using GPT-prepared structured case study data.}
     \label{fig:gpt_llm_outputs}
 \end{figure}
-
-
-
 %% Appendices may be used for helpful, supporting or essential material that would otherwise 
 %% clutter, break up or be distracting to the text. Appendices can consist of sections, figures, 
 %% tables and equations etc.
-
 \end{appendices}
 
 %%===========================================================================================%%
