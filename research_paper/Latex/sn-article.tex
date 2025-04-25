@@ -794,7 +794,8 @@ By contrast, outputs generated from LLM-prepared inputs exhibited slightly more 
         \label{fig:manual_bars}
     \end{figure}
 
-    Across manually curated inputs, Claude’s synthesis agent in MediSyn clearly outperforms the base and tuned variants on human-aligned metrics such as accuracy and specificity, while keeping omission relatively low. For GPT-4o, prompt tuning and synthesis perform comparably, with MediSyn slightly ahead on accuracy. LLaMA 3.2 shows peak values on accuracy and plausibility with prompt tuning, while synthesis gives higher specificity at a modest omission cost.
+Across manually curated inputs, Claude 3.5 shows the strongest performance under the MediSyn configuration on human-aligned metrics such as accuracy, specificity, and plausibility. Although its base model achieves higher BLEU and ROUGE scores, these surface metrics do not reflect the interprofessional structure and role segmentation emphasized by MediSyn. For GPT-4o, prompt tuning leads across most metrics—particularly accuracy and plausibility—indicating the model’s sensitivity to direct instruction. MediSyn remains close in performance but does not significantly surpass tuning. In the case of LLaMA 3.2, prompt-tuned output achieves the highest accuracy and plausibility, while MediSyn improves specificity at the cost of slightly higher omission and reduced BLEU/ROUGE alignment. Overall, the synthesis agent boosts interprofessional fidelity but introduces moderate tradeoffs depending on model characteristics.
+
 
 % --------------------------------------------------------
 
@@ -830,10 +831,11 @@ By contrast, outputs generated from LLM-prepared inputs exhibited slightly more 
         \label{fig:llm_bars}
     \end{figure}
 
-    LLM-extracted inputs introduce noise but preserve consistent method rankings. For Claude, the MediSyn architecture produces a substantial leap in accuracy and specificity, highlighting its robustness to input quality. GPT-4o performs best with prompt tuning under noisy conditions, balancing accuracy with minimal omission. LLaMA again peaks in accuracy through tuning, with synthesis trailing closely but offering better specificity.
+LLM-extracted inputs introduce moderate noise, yet overall method rankings remain consistent across models. For Claude 3.5, the MediSyn variant yields the highest accuracy and specificity among the three configurations, demonstrating resilience to input imperfections and strong interprofessional structure. However, surface metrics (BLEU, ROUGE) remain highest in the base version, highlighting a tradeoff between lexical overlap and clinical structure. GPT-4o performs best under prompt tuning, showing peak values across accuracy, plausibility, and specificity, with relatively low omission. MediSyn remains competitive but does not surpass the tuned variant. For LLaMA 3.2, prompt tuning again leads in accuracy and plausibility, while MediSyn improves role segmentation and specificity, albeit with slightly elevated omission. These patterns affirm that prompt engineering remains effective under noisy conditions, while MediSyn enhances interprofessional fidelity and content depth across models.
+
 
 % --------------------------------------------------------
-    \subsubsection*{Key takeaways and overall accuracy trends}
+    \paragraph{Overall accuracy trends}
 
     \begin{figure}[H]
         \centering
@@ -855,12 +857,26 @@ By contrast, outputs generated from LLM-prepared inputs exhibited slightly more 
     \end{figure}
 
     \noindent
-    These figures highlight that manual data consistently enhances absolute scores and lowers omissions. Among the LLMs, Claude 3.5 benefits the most from MediSyn, especially with noisy data—showing the sharpest gain in both accuracy and specificity. GPT-4o is more responsive to prompt tuning across both data regimes, with its synthesis variant showing slight improvements in interpretability. LLaMA 3.2 achieves high accuracy with prompt tuning but sees gains in specificity under the synthesis model. MediSyn remains a stable and high-performing method even under LLM-induced noise, confirming its effectiveness as a collaborative framework in multi-agent clinical reasoning.
+These figures highlight that manual data consistently enhances absolute accuracy scores and reduces omissions across all models. Among the LLMs, Claude 3.5 benefits most from the MediSyn framework, especially under noisy input conditions—showing a pronounced increase in both accuracy and specificity. GPT-4o demonstrates its strongest performance with prompt-tuned inputs in both data regimes, while its MediSyn variant trails slightly, offering modest improvements in structural clarity but lower overall accuracy. LLaMA 3.2 reaches peak accuracy with prompt tuning, though MediSyn improves specificity and maintains competitive results despite slightly elevated omission. Overall, MediSyn proves particularly effective for Claude and remains a resilient method under LLM-extracted data, reinforcing its utility in collaborative clinical reasoning contexts.
+
+\textit{How does the quality of treatment plan generation differ when using manually prepared data versus LLM-prepared data?}
+
+Across all models and generation methods, manually curated input consistently led to higher accuracy, greater specificity, and fewer omissions. This is most pronounced for Claude 3.5, which saw substantial gains under the MediSyn framework when fed clean, manually structured JSON. LLaMA 3.2 also benefited from manual data, particularly in its prompt-tuned configuration, which achieved peak accuracy in that condition. GPT-4o showed smaller deltas across data regimes but remained most consistent with prompt tuning.
+
+By contrast, LLM-prepared data introduced mild degradation in formatting fidelity and content coverage—likely due to inconsistencies in field boundaries or paraphrased content during auto-extraction. However, MediSyn’s synthesis step mitigated much of this noise for Claude and LLaMA, maintaining strong performance even with imperfect inputs. Prompt tuning also proved resilient, especially for GPT-4o, which retained high plausibility and structure despite reduced granularity.
+
+Overall, while manual input remains the gold standard for structured fidelity, the results confirm that LLM-generated input can support high-quality treatment planning when paired with prompt tuning or multi-agent synthesis architectures like MediSyn.
+
+
 
 %--------------------------------------------------------
 
 
 \section{Discussion and Limitations}\label{sec5}
+
+
+
+
 
 \section{Conclusion}\label{sec6}
 
