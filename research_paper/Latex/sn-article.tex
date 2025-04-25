@@ -874,11 +874,27 @@ Overall, while manual input remains the gold standard for structured fidelity, t
 
 \section{Discussion and Limitations}\label{sec5}
 
+This work presents MediSyn, a modular multi-agent generation system designed to emulate real-world interprofessional collaboration in clinical decision-making. Evaluated across 15 diverse IPE case studies, our findings show that MediSyn consistently enhances the structural fidelity, role attribution, and contextual depth of treatment plans when compared to single-LLM and prompt-tuned approaches. The architecture's ability to simulate discipline-specific perspectives—while synthesizing them into a unified treatment plan—proved especially effective for Claude 3.5 and LLaMA 3.2. Even GPT-4o, which tends to produce more compact outputs, demonstrated improved interprofessional coherence when integrated into the MediSyn framework.
 
+A central theme in our analysis is the contrast between qualitative and quantitative evaluation outcomes. On the one hand, qualitative inspection—supported by examples in Section~\ref{sec4.3}—clearly favored MediSyn for its role-sensitive structure, clarity, and alignment with IPE documentation practices. On the other hand, quantitative metrics such as BLEU and ROUGE did not always reflect these strengths, with prompt-tuned or even base configurations outperforming MediSyn on surface-level n-gram overlap. This divergence raises a critical question for the field: \textit{To what extent should we rely on traditional lexical metrics when evaluating clinical reasoning outputs, and when should human-aligned criteria—such as plausibility, specificity, and interprofessional clarity—take precedence?} Addressing this requires deeper collaboration with domain experts to define evaluation benchmarks that align with both medical and educational standards.
+
+Despite its promise, MediSyn has limitations. First, our use of GPT-4o as an LLM-based evaluator—while scalable and consistent—remains a proxy for expert human judgment. Although GPT-4o offers high fluency and general-purpose reasoning, its assessments may not fully capture clinical appropriateness or educational value. Future work should incorporate expert clinician evaluation for more robust validation.
+
+Second, while we employed 15 case studies covering a range of team compositions and conditions, this sample size remains modest for large-scale benchmarking. The generalizability of findings to other IPE contexts—especially those involving underrepresented professions or more complex cases—requires further exploration.
+
+Third, although MediSyn is designed to be model-agnostic, our analysis focused on three LLMs (GPT-4o, Claude 3.5, and LLaMA 3.2) without fine-tuning. Incorporating domain-adapted or instruction-tuned versions may reveal additional benefits or alter observed performance patterns.
+
+Lastly, the modularity of MediSyn introduces its own challenges. Role prompts must be carefully crafted to ensure scope fidelity, and synthesis quality depends on the coherence of upstream agent outputs. Imperfections in auto-extracted input (e.g., paraphrasing drift or ambiguous role mentions) can propagate into the final plan, especially under noisy LLM-prepared conditions.
+
+Nonetheless, our results affirm that MediSyn provides a promising foundation for simulating collaborative clinical reasoning. Its ability to encode domain boundaries, promote inter-agent diversity, and synthesize profession-aware outputs makes it a valuable tool for both AI-driven medical education and the development of future interprofessional support systems.
 
 
 
 \section{Conclusion}\label{sec6}
+We introduced MediSyn, a multi-agent generation framework that simulates interprofessional reasoning for medical treatment planning. By dynamically instantiating role-specific agents and synthesizing their outputs, MediSyn produces structured, collaborative plans aligned with IPE/IPP practices. Evaluated on 15 diverse case studies, MediSyn demonstrated strong performance in producing clinically coherent and role-attributed outputs, particularly when paired with models like Claude 3.5 and LLaMA 3.2. While prompt tuning improved alignment in many cases, MediSyn consistently enhanced structure and interprofessional clarity—especially under noisy, LLM-prepared inputs.
+
+Our findings underscore the limitations of surface-level metrics and highlight the value of human-aligned evaluation criteria such as specificity and plausibility. As LLMs continue to evolve, frameworks like MediSyn offer a promising foundation for AI-assisted education and team-based clinical reasoning, with opportunities for further refinement through expert evaluation and domain-specific tuning.
+
 
 \section*{Data Availability}
 The datasets generated and/or analyzed during the current study will be made available in a public repository upon publication. In the interim, they are available from the corresponding author on reasonable request.
