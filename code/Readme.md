@@ -15,17 +15,24 @@ This project explores how a specialized multi-agent design compares to more gene
 ## Project Structure
 ```
 code/
-├── src/                      # Source code
-│   ├── agents/               # Agent implementation
-│   │   ├── base_agent.py     # Base agent class
-│   │   ├── dynamic_agent.py  # Dynamic agent manager
-│   ├── configs/              # Configuration files
-│   │   ├── configs.py        # System prompts and configurations
-│   ├── data/                 # Case study data
-│   │   ├── casestudy/        # Manually prepared case studies
-│   ├── eval/                 # Evaluation modules
-│   │   ├── evaluate.py       # Treatment plan evaluator
-│   ├── main.py               # Main execution script
+├── src/                                              # Source code
+│   ├── agents/                                       # Agent implementation
+│   │   ├── base_agent.py                             # Base agent class
+│   │   ├── dynamic_agent.py                          # Dynamic agent manager
+│   ├── configs/                                      # Configuration files
+│   │   ├── configs.py                                # System prompts and configurations
+│   ├── data/                                         # Data Prep
+│   │   ├── case_study_dataprep_pdf_to_text.py
+│   │   ├── case_study_dataprep_pdf_to_text.py
+│   │   ├── claude_pdf_to_json.py 
+│   │   ├── gpt_pdf_to_json.py
+│   │   ├── llama_pdf_to_json.py
+│   ├── eval/                                         # Evaluation modules
+│   │   ├── evaluate.py                               # Treatment plan evaluator
+│   │   ├── analysis.py                               # Analysis of evaluation                               
+│   ├── main.py                                       # Main execution script
+│   ├── Readme.Md                                     # ReadMe file
+│   ├── requirements.txt                              # Dependencies
 ```
 
 ## Installation
